@@ -1,0 +1,19 @@
+# Gizli bilgiler — asla commit'lenmesin
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Üretilen içerik (görsel, caption, meta.json)
+outputs/
+
+# Node / Next.js (arayüz eklendiğinde)
+node_modules/
+.next/
+
+# İşletim sistemi
+.DS_Store
+Thumbs.db
