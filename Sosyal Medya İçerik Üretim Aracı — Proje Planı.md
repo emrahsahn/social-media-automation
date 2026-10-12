@@ -136,7 +136,7 @@ Böylece her post aynı ölçüde ve metin konumu birebir tutarlı çıkar.
 
 #### Metin Bindirme Kuralları
 
-- **Font:** Türkçe karakterleri (ğ, ş, İ, ı, ö, ü, ç) destekleyen bir TTF kullanılmalı (Latin Extended-A desteği; örn. Inter, Montserrat, Poppins)
+- **Font:** Türkçe karakterleri (ğ, ş, İ, ı, ö, ü, ç) destekleyen bir TTF kullanılmalı (Latin Extended-A desteği; örn. Inter, Montserrat, Poppins). Karar (2026-10-11): **Poppins Bold** (OFL lisanslı, `assets/fonts/Poppins-Bold.ttf`); bulunamazsa `brand.json` fallback listesine düşer (Segoe UI Bold / Arial Bold)
 - **Taşma yönetimi:**
   - Karakter limiti (örn. max ~60 karakter) — form alanında kullanıcıya gösterilir
   - Uzun metin otomatik satır kaydırma (word-wrap) ile bölünür
@@ -183,8 +183,8 @@ Böylece her post aynı ölçüde ve metin konumu birebir tutarlı çıkar.
 
 1. Form şemasını (alanlar, zorunlu/opsiyonel, varsayılanlar) netleştir — tamamlandı: 2026-10-10
 2. `.env` ile anahtar yönetimini, retry davranışını ve üretim başına maliyet kaydını kur — tamamlandı: 2026-10-10
-3. Tek bir tema için uçtan uca akışı çalıştır: form girdisi → LLM prompt → görsel üret → hedef tuvale getir (crop/resize) → metin bindir → caption düzenle → local'e kaydet
-4. Format spesifikasyonunu netleştir ve sabitle: Türkçe destekli font, taşma kuralları (wrap/limit/auto-shrink), renk, pozisyon; marka ayarlarını tek config dosyasında topla
+3. Tek bir tema için uçtan uca akışı çalıştır: form girdisi → LLM prompt → görsel üret → hedef tuvale getir (crop/resize) → metin bindir → caption düzenle → local'e kaydet — tamamlandı: 2026-10-10 (mock modda doğrulandı: `python -m pipeline.cli --mock`; gerçek API çalıştırması `.env`'e anahtar konulunca yapılacak; sağlayıcı kararı: OpenAI tek anahtar). Caption düzenleme arayüzü 6. adımda.
+4. Format spesifikasyonunu netleştir ve sabitle: Türkçe destekli font, taşma kuralları (wrap/limit/auto-shrink), renk, pozisyon; marka ayarlarını tek config dosyasında topla — tamamlandı: 2026-10-11 (`brand.json` tek kaynak: font/punto/renk/pozisyon/gradient/taşma; wrap + auto-shrink + max_chars limiti mock testlerle doğrulandı)
 5. Referans görsel desteğini ekle (önce B1 stil çözümleme, sonra B2 edit API)
 6. Galeri + "yeniden üret" akışını ve önizlemede caption/hashtag düzenlemeyi ekle
 7. Birden fazla post'u toplu üretecek bir script/CLI'ye genişlet

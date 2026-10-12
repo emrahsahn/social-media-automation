@@ -1,0 +1,29 @@
+{
+  "_comment": "Marka standardı: metin bindirme ayarlarının tek kaynağı. Kod bu dosyayı okur (pipeline/brand.py); eksik bırakılan alanlar varsayılanlarla tamamlanır. Renkler #RRGGBB.",
+  "font": {
+    "file": "assets/fonts/Poppins-Bold.ttf",
+    "fallbacks": [
+      "assets/fonts/Inter-Bold.ttf",
+      "assets/fonts/Montserrat-Bold.ttf",
+      "C:/Windows/Fonts/segoeuib.ttf",
+      "C:/Windows/Fonts/arialbd.ttf"
+    ],
+    "size_base": 68,
+    "size_min": 34,
+    "size_reference_width": 1080
+  },
+  "text": {
+    "color": "#FFFFFF",
+    "max_chars": 60,
+    "max_lines": 3,
+    "align": "center",
+    "bottom_margin_ratio": 0.16,
+    "side_padding_ratio": 0.055,
+    "line_spacing": 1.18
+  },
+  "strip": {
+    "color": "#000000",
+    "max_alpha": 165,
+    "height_ratio": 0.34
+  }
+}
