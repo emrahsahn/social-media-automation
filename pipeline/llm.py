@@ -15,8 +15,9 @@ from pipeline.formats import FORMATS
 from pipeline.retry import call_with_retry
 
 DEFAULT_TEXT_MODEL = "gpt-4o"
+DEFAULT_ANTHROPIC_MODEL = "claude-3-5-sonnet-20241022"
 
-SYSTEM_PROMPT = """Sen bir sosyal medya içerik üreticisi ve görsel prompt mühendisisin.
+DEFAULT_SYSTEM_PROMPT = """Sen bir sosyal medya içerik üreticisi ve görsel prompt mühendisisin.
 Kullanıcının form girdisinden şunları üretirsin:
 1. "prompts": istenen görsel sayısı kadar, İngilizce yazılmış, detaylı görsel üretim prompt'u.
    - Prompt'lar birbirinden hafif farklı olmalı (kompozisyon, açı veya ışık varyasyonu).
@@ -25,7 +26,31 @@ Kullanıcının form girdisinden şunları üretirsin:
      ifadesini içermeli; metin sonradan kod ile bindirilecek.
 2. "caption": Türkçe, samimi ama profesyonel tonda 1-3 cümle.
 3. "hashtags": 5-10 adet, # ile başlayan Türkçe hashtag.
+4. Girdide `style_analysis` alanı varsa (referans görselin stil çözümlemesi):
+   her prompt bu stil özelliklerini yansıtmalı (kompozisyon, ışık, renk paleti, ton).
+   Konu yine formdaki tema olmalı; referans görselin kendisi kopyalanmamalı,
+   yalnızca stili aktarılmalı.
 Sadece verilen JSON şemasına uygun yanıt ver."""
+
+# Geriye dönük uyumluluk
+SYSTEM_PROMPT = DEFAULT_SYSTEM_PROMPT
+
+
+def get_system_prompt(custom_prompt: str | None = None) -> str:
+    """Kullanıcı tanımlı veya varsayılan sistem promptunu döner."""
+    if not custom_prompt or not custom_prompt.strip():
+        return DEFAULT_SYSTEM_PROMPT
+
+    user_text = custom_prompt.strip()
+    safety_rules = (
+        "\n\n[SİSTEM TEKNİK ZORUNLULUKLARI]:\n"
+        "- Prompts dizisindeki her prompt MUTLAKA 'no text, no letters, no words, no logos, no watermarks' ifadesini içermelidir (metin sonradan kod ile bindirilir).\n"
+        "- Kompozisyon merkezde tutulmalıdır.\n"
+        "- Sadece ve sadece belirtilen JSON şemasına uygun tek bir JSON yanıtı verilmelidir."
+    )
+    if "no text" not in user_text.lower():
+        user_text += safety_rules
+    return user_text
 
 JSON_SCHEMA = {
     "name": "social_post_content",
@@ -88,12 +113,21 @@ def mock_content(payload: dict) -> tuple[dict, dict]:
     topic = (payload.get("topic") or "test gönderisi").strip()
     count = max(1, int(payload.get("image_count") or 2))
     spec = FORMATS[payload.get("format", "post_4x5")]
+    style = payload.get("style_analysis") or {}
+    style_part = ""
+    if style:
+        style_part = (
+            f" Style reference: {style.get('style_summary', '')}. "
+            f"Lighting: {style.get('lighting', '')}. "
+            f"Composition: {style.get('composition', '')}."
+        )
     prompts = [
         {
             "id": i,
             "prompt": (
                 f"{_MOCK_SCENES[(i - 1) % len(_MOCK_SCENES)]}. "
-                f"Subject related to: {topic}. Aspect ratio {spec.aspect_ratio}. "
+                f"Subject related to: {topic}. Aspect ratio {spec.aspect_ratio}."
+                f"{style_part} "
                 "No text, no letters, no words, no logos, no watermarks."
             ),
             "aspect_ratio": spec.aspect_ratio,
@@ -113,9 +147,12 @@ def mock_content(payload: dict) -> tuple[dict, dict]:
     }
     return content, usage
 
-
 def generate_content(
-    payload: dict, *, mock: bool = False, model: str = DEFAULT_TEXT_MODEL
+    payload: dict,
+    *,
+    mock: bool = False,
+    provider: str = "openai",
+    model: str | None = None,
 ) -> tuple[dict, dict]:
     """Payload'dan içerik üretir; `(content, usage)` döner.
 
@@ -125,30 +162,74 @@ def generate_content(
     if mock:
         return mock_content(payload)
 
-    get_api_key("openai")  # anahtar yoksa en başta anlaşılır hata
-    from openai import OpenAI
+    provider = provider.lower()
+    sys_prompt = get_system_prompt(payload.get("system_prompt"))
 
-    client = OpenAI()
+    if provider == "anthropic":
+        get_api_key("anthropic")
+        import anthropic
 
-    def _call():
-        return client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": _user_message(payload)},
-            ],
-            response_format={"type": "json_schema", "json_schema": JSON_SCHEMA},
-            temperature=0.8,
+        client = anthropic.Anthropic()
+        target_model = model or DEFAULT_ANTHROPIC_MODEL
+        anthropic_system = (
+            sys_prompt
+            + "\n\nYANIT FORMATI: Sadece ve sadece şu JSON yapısına uyan tek bir geçerli JSON nesnesi ver. "
+            + 'Markdown blokları (```json) veya ekstra metin ekleme:\n'
+            + '{"prompts": [{"id": 1, "prompt": "...", "aspect_ratio": "4:5"}], "caption": "...", "hashtags": ["#tag1"]}'
         )
 
-    resp = call_with_retry(_call)
-    raw = resp.choices[0].message.content
-    content = _validate_content(json.loads(raw), int(payload.get("image_count") or 2))
-    usage = resp.usage
-    meta = {
-        "provider": "openai",
-        "model": model,
-        "input_tokens": getattr(usage, "prompt_tokens", 0) or 0,
-        "output_tokens": getattr(usage, "completion_tokens", 0) or 0,
-    }
-    return content, meta
+        def _call_anthropic():
+            return client.messages.create(
+                model=target_model,
+                max_tokens=2048,
+                system=anthropic_system,
+                messages=[{"role": "user", "content": _user_message(payload)}],
+                temperature=0.7,
+            )
+
+        resp = call_with_retry(_call_anthropic)
+        raw = resp.content[0].text.strip()
+        if raw.startswith("```"):
+            raw = raw.strip("`")
+            if raw.startswith("json"):
+                raw = raw[4:].strip()
+        content = _validate_content(json.loads(raw), int(payload.get("image_count") or 2))
+        usage = {
+            "provider": "anthropic",
+            "model": target_model,
+            "input_tokens": getattr(resp.usage, "input_tokens", 0) or 0,
+            "output_tokens": getattr(resp.usage, "output_tokens", 0) or 0,
+        }
+        return content, usage
+
+    if provider == "openai":
+        get_api_key("openai")  # anahtar yoksa en başta anlaşılır hata
+        from openai import OpenAI
+
+        client = OpenAI()
+        target_model = model or DEFAULT_TEXT_MODEL
+
+        def _call_openai():
+            return client.chat.completions.create(
+                model=target_model,
+                messages=[
+                    {"role": "system", "content": sys_prompt},
+                    {"role": "user", "content": _user_message(payload)},
+                ],
+                response_format={"type": "json_schema", "json_schema": JSON_SCHEMA},
+                temperature=0.8,
+            )
+
+        resp = call_with_retry(_call_openai)
+        raw = resp.choices[0].message.content
+        content = _validate_content(json.loads(raw), int(payload.get("image_count") or 2))
+        usage = resp.usage
+        meta = {
+            "provider": "openai",
+            "model": target_model,
+            "input_tokens": getattr(usage, "prompt_tokens", 0) or 0,
+            "output_tokens": getattr(usage, "completion_tokens", 0) or 0,
+        }
+        return content, meta
+
+    raise ValueError(f"Desteklenmeyen LLM sağlayıcısı: {provider!r}. 'openai' veya 'anthropic' seçin.")

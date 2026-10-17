@@ -4,3 +4,12 @@ anthropic>=0.40
 
 # Görsel işleme: metin bindirme, crop/resize (Sonraki Adımlar #3-#4)
 Pillow>=10.4
+
+# Test
+pytest>=8.0
+
+# Web Arayüzü (Adım 6)
+fastapi>=0.110
+uvicorn>=0.28
+python-multipart>=0.0.9
+

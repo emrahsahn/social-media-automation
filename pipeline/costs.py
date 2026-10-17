@@ -21,6 +21,17 @@ PRICING_NOTE = (
 # (sağlayıcı, model) -> {(boyut, kalite): görsel başı USD}
 # ("default", "default") anahtarı, tabloda tam eşleşme yoksa kullanılır.
 IMAGE_PRICES: dict[tuple[str, str], dict[tuple[str, str], float]] = {
+    ("openai", "dall-e-3"): {
+        ("1024x1024", "standard"): 0.040,
+        ("1024x1024", "hd"): 0.080,
+        ("1024x1792", "standard"): 0.080,
+        ("1024x1792", "hd"): 0.120,
+        ("default", "default"): 0.080,
+    },
+    ("openai", "dall-e-2"): {
+        ("1024x1024", "standard"): 0.020,
+        ("default", "default"): 0.020,
+    },
     ("openai", "gpt-image-1"): {
         ("1024x1024", "low"): 0.011,
         ("1024x1024", "medium"): 0.042,
@@ -30,14 +41,14 @@ IMAGE_PRICES: dict[tuple[str, str], dict[tuple[str, str], float]] = {
         ("1024x1536", "high"): 0.250,
         ("default", "default"): 0.042,
     },
-    # Replicate üzerinden Flux vb. eklenirse örnek kalıp:
-    # ("replicate", "flux-1.1-pro"): {("default", "default"): 0.04},
 }
 
 # (sağlayıcı, model) -> (girdi USD / 1M token, çıktı USD / 1M token)
 TEXT_PRICES: dict[tuple[str, str], tuple[float, float]] = {
     ("openai", "gpt-4o"): (2.50, 10.00),
     ("anthropic", "claude-sonnet-4-5"): (3.00, 15.00),
+    ("anthropic", "claude-3-5-sonnet-20241022"): (3.00, 15.00),
+    ("anthropic", "claude-3-5-sonnet"): (3.00, 15.00),
 }
 
 

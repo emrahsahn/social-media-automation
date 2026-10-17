@@ -1,0 +1,3092 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sosyal Medya Otomasyon — Instagram İçerik Stüdyosu</title>
+  <meta name="description" content="Instagram gönderi, hikaye, metin bindirme ve caption üretim otomasyonu.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* =========================================================
+       SOSYAL MEDYA OTOMASYON — MONOCHROME BLACK & WHITE DESIGN
+       - Sadece Instagram logosu orijinal rengindedir.
+       - Geri kalan tüm tema ve arayüz elemanları siyah-beyazdır.
+       ========================================================= */
+    :root, [data-theme="dark"] {
+      --bg-base: #000000;
+      --bg-surface: #0C0C0E;
+      --bg-card: #121215;
+      --bg-elevated: #18181C;
+      --bg-input: #0A0A0C;
+      --border-subtle: #24242A;
+      --border-strong: #3F3F46;
+      --border-focus: #FFFFFF;
+      --text-main: #FFFFFF;
+      --text-muted: #A1A1AA;
+      --text-dim: #71717A;
+      
+      /* TEK RENKLİ ALAN: Sadece Instagram Logosu */
+      --insta-logo-gradient: linear-gradient(135deg, #833AB4 0%, #FD1D1D 50%, #FCB045 100%);
+      --insta-logo-glow: rgba(225, 48, 108, 0.4);
+
+      /* Siyah-Beyaz Buton ve Vurgu Sistemi */
+      --btn-primary-bg: #FFFFFF;
+      --btn-primary-text: #000000;
+      --btn-primary-hover: #E4E4E7;
+      
+      --phone-bg: #000000;
+      --phone-border: #27272A;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-xl: 28px;
+      --shadow-glass: 0 16px 40px rgba(0, 0, 0, 0.85);
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="light"] {
+      --bg-base: #FFFFFF;
+      --bg-surface: #F4F4F5;
+      --bg-card: #FFFFFF;
+      --bg-elevated: #ECECED;
+      --bg-input: #FFFFFF;
+      --border-subtle: #E4E4E7;
+      --border-strong: #D4D4D8;
+      --border-focus: #000000;
+      --text-main: #09090B;
+      --text-muted: #52525B;
+      --text-dim: #A1A1AA;
+
+      --insta-logo-gradient: linear-gradient(135deg, #833AB4 0%, #FD1D1D 50%, #FCB045 100%);
+      --insta-logo-glow: rgba(225, 48, 108, 0.25);
+
+      --btn-primary-bg: #000000;
+      --btn-primary-text: #FFFFFF;
+      --btn-primary-hover: #27272A;
+
+      --phone-bg: #FFFFFF;
+      --phone-border: #E4E4E7;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-xl: 28px;
+      --shadow-glass: 0 12px 30px rgba(0, 0, 0, 0.08);
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-base);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+    /* =========================================================
+       1. TAM EKRAN LOGİN GÖRÜNÜMÜ (LOGIN SCREEN)
+       ========================================================= */
+    #viewLoginScreen {
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      background: var(--bg-base);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 9999;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 420px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 2.75rem 2.25rem;
+      box-shadow: var(--shadow-glass);
+      text-align: center;
+      animation: modalFadeUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalFadeUp {
+      from { opacity: 0; transform: scale(0.96) translateY(12px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* SADECE INSTAGRAM LOGOSU RENKLİDİR */
+    .insta-brand-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 16px;
+      background: var(--insta-logo-gradient);
+      box-shadow: 0 6px 25px var(--insta-logo-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .insta-brand-icon svg {
+      width: 32px;
+      height: 32px;
+      fill: #FFFFFF;
+    }
+
+    .login-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      margin-bottom: 0.35rem;
+    }
+
+    .login-subtitle {
+      font-size: 0.825rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .login-field-group {
+      margin-bottom: 1.25rem;
+      text-align: left;
+    }
+
+    .login-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.45rem;
+    }
+
+    .login-input {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      font-size: 0.9rem;
+      font-family: inherit;
+      padding: 0.85rem 1rem;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .login-input:focus {
+      border-color: var(--border-focus);
+      background: var(--bg-card);
+    }
+
+    .login-btn {
+      width: 100%;
+      background: var(--btn-primary-bg);
+      color: var(--btn-primary-text);
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      padding: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: var(--transition);
+      margin-top: 0.5rem;
+    }
+
+    .login-btn:hover {
+      background: var(--btn-primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .login-error {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      color: var(--text-main);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.65rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .login-hint-text {
+      margin-top: 1.5rem;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .login-hint-text code {
+      background: var(--bg-elevated);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    /* =========================================================
+       2. ANA UYGULAMA VE HEADER (MONOCHROME)
+       ========================================================= */
+    #mainAppWrapper {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 0.85rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.25rem;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .brand-logo-small {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--insta-logo-gradient);
+      box-shadow: 0 4px 15px var(--insta-logo-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: var(--transition);
+    }
+
+    .brand-logo-small svg {
+      width: 22px;
+      height: 22px;
+      fill: #FFFFFF;
+    }
+
+    .brand-wrap:hover .brand-logo-small {
+      transform: scale(1.05);
+    }
+
+    .brand-titles h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .brand-tag {
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--text-main);
+      color: var(--bg-base);
+    }
+
+    /* Monochrome Segmented Navigation */
+    .nav-tabs {
+      display: inline-flex;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .nav-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.825rem;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+    }
+
+    .nav-tab-btn:hover {
+      color: var(--text-main);
+    }
+
+    .nav-tab-btn.active {
+      background: var(--btn-primary-bg);
+      color: var(--btn-primary-text);
+    }
+
+    /* Header Actions */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .btn-mono {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+    }
+
+    .btn-mono:hover {
+      background: var(--text-main);
+      color: var(--bg-base);
+      border-color: var(--text-main);
+    }
+
+    .status-badge-mono {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .status-dot-mono {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-main);
+    }
+
+    /* Mobile Segment Bar (< 900px) */
+    .mobile-segment-bar {
+      display: none;
+      position: sticky;
+      top: 61px;
+      z-index: 90;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0.5rem 1rem;
+    }
+
+    .mobile-segment-inner {
+      display: flex;
+      background: var(--bg-elevated);
+      border-radius: 999px;
+      padding: 3px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .mobile-seg-btn {
+      flex: 1;
+      padding: 8px 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 700;
+      border-radius: 999px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: var(--transition);
+    }
+
+    .mobile-seg-btn.active {
+      background: var(--btn-primary-bg);
+      color: var(--btn-primary-text);
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 1440px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.75rem 2rem 3rem;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Studio Layout */
+    .studio-layout {
+      display: grid;
+      grid-template-columns: 460px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    /* Monochrome Panels */
+    .studio-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.6rem;
+      box-shadow: var(--shadow-glass);
+      position: relative;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.4rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .panel-header-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .panel-header-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Form Controls */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.45rem;
+    }
+
+    .form-hint {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--text-dim);
+    }
+
+    .input-text, .select-input, .textarea-custom {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-strong);
+      color: var(--text-main);
+      padding: 0.75rem 0.95rem;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 0.85rem;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .input-text:focus, .select-input:focus, .textarea-custom:focus {
+      border-color: var(--border-focus);
+      background: var(--bg-elevated);
+    }
+
+    /* Suggestion Chips */
+    .chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.5rem;
+    }
+
+    .chip-item {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .chip-item:hover {
+      color: var(--bg-base);
+      background: var(--text-main);
+      border-color: var(--text-main);
+      transform: translateY(-1px);
+    }
+
+    /* Format Cards */
+    .format-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+    }
+
+    .format-card {
+      background: var(--bg-elevated);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 0.6rem;
+      cursor: pointer;
+      text-align: center;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      position: relative;
+    }
+
+    .format-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+    }
+
+    .format-card.active {
+      border-color: var(--text-main);
+      background: var(--bg-card);
+      box-shadow: 0 0 0 1px var(--text-main);
+    }
+
+    .format-card-ratio {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--bg-surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .format-card.active .format-card-ratio {
+      background: var(--text-main);
+      color: var(--bg-base);
+      border-color: transparent;
+    }
+
+    .format-card-name {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+
+    .format-card-res {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+    }
+
+    .format-card-badge {
+      position: absolute;
+      top: -6px;
+      right: -4px;
+      background: var(--text-main);
+      color: var(--bg-base);
+      font-size: 0.55rem;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Pill Selectors */
+    .pills-bar {
+      display: flex;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 3px;
+      gap: 3px;
+    }
+
+    .pill-btn {
+      flex: 1;
+      padding: 7px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: var(--transition);
+    }
+
+    .pill-btn:hover {
+      color: var(--text-main);
+    }
+
+    .pill-btn.active {
+      background: var(--text-main);
+      color: var(--bg-base);
+    }
+
+    /* Logo Konum Seçici Izgarası */
+    .logo-pos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+    }
+
+    .pos-btn {
+      padding: 7px 4px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-elevated);
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: var(--transition);
+    }
+
+    .pos-btn:hover {
+      color: var(--text-main);
+      border-color: var(--border-strong);
+    }
+
+    .pos-btn.active {
+      background: var(--text-main);
+      color: var(--bg-base);
+      border-color: var(--text-main);
+    }
+
+    /* Accordion Drawer */
+    .drawer-card {
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      background: var(--bg-elevated);
+      margin-bottom: 1.25rem;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .drawer-header {
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .drawer-header:hover {
+      background: var(--bg-surface);
+    }
+
+    .drawer-header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .drawer-body {
+      padding: 0 1rem 1rem 1rem;
+      display: none;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 0.85rem;
+    }
+
+    .drawer-card.open .drawer-body {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    /* Main Submit Button (Black & White High-Contrast) */
+    .btn-create-mono {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-md);
+      background: var(--btn-primary-bg);
+      border: 1px solid var(--text-main);
+      color: var(--btn-primary-text);
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      transition: var(--transition);
+      margin-top: 0.5rem;
+    }
+
+    .btn-create-mono:hover:not(:disabled) {
+      background: var(--btn-primary-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn-create-mono:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* =========================================================
+       3. INSTAGRAM TELEFON SİMÜLATÖRÜ (MONOCHROME)
+       ========================================================= */
+    .preview-canvas-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .phone-simulator-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem 2rem;
+      box-shadow: var(--shadow-glass);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .phone-device {
+      width: 100%;
+      max-width: 440px;
+      background: var(--phone-bg);
+      border: 4px solid var(--phone-border);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--border-subtle);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .phone-notch-bar {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: var(--phone-bg);
+      z-index: 10;
+    }
+
+    .phone-island {
+      width: 90px;
+      height: 14px;
+      background: var(--bg-elevated);
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+    }
+
+    .phone-island-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--text-dim);
+    }
+
+    .insta-phone-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--phone-bg);
+    }
+
+    .insta-user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .insta-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--border-strong);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .insta-avatar-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .insta-usernames {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .insta-handle {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .insta-verified {
+      width: 13px;
+      height: 13px;
+      fill: var(--text-main);
+    }
+
+    .insta-subtext {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+
+    .insta-dots {
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+
+    .insta-media-viewport {
+      width: 100%;
+      position: relative;
+      background: #000000;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: aspect-ratio 0.3s ease;
+    }
+
+    .aspect-4x5 { aspect-ratio: 4 / 5; }
+    .aspect-1x1 { aspect-ratio: 1 / 1; }
+    .aspect-9x16 { aspect-ratio: 9 / 16; }
+
+    .insta-media-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Idle Mockup Canvas */
+    .insta-idle-canvas {
+      width: 100%;
+      height: 100%;
+      background: #09090C;
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .idle-ratio-badge {
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: #18181C;
+      border: 1px solid var(--border-strong);
+      color: #FFFFFF;
+      margin-bottom: 1.25rem;
+      z-index: 2;
+    }
+
+    .idle-live-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 800;
+      line-height: 1.25;
+      color: #FFFFFF;
+      max-width: 280px;
+      z-index: 2;
+      transition: var(--transition);
+    }
+
+    .idle-sub-tip {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 1rem;
+      max-width: 240px;
+      line-height: 1.4;
+      z-index: 2;
+    }
+
+    .insta-actions-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 1rem 0.45rem;
+      background: var(--phone-bg);
+    }
+
+    .insta-actions-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .insta-action-icon {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      fill: none;
+      stroke: var(--text-main);
+      stroke-width: 2;
+      transition: var(--transition);
+    }
+
+    .insta-action-icon:hover {
+      transform: scale(1.15);
+    }
+
+    .insta-phone-caption-area {
+      padding: 0 1rem 0.85rem;
+      background: var(--phone-bg);
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+
+    .insta-likes-count {
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 0.25rem;
+    }
+
+    .insta-caption-text {
+      color: var(--text-muted);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .insta-caption-text strong {
+      color: var(--text-main);
+      font-weight: 800;
+      margin-right: 4px;
+    }
+
+    /* Loading Stepper */
+    .loading-stepper-box {
+      display: none;
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      box-shadow: var(--shadow-glass);
+    }
+
+    .loading-spin-ring {
+      width: 50px;
+      height: 50px;
+      border: 3px solid var(--border-subtle);
+      border-top-color: var(--text-main);
+      border-radius: 50%;
+      margin: 0 auto 1.5rem;
+      animation: spin 0.85s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-width: 320px;
+      margin: 1.5rem auto 0;
+    }
+
+    .step-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 1rem;
+      border-radius: 999px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-align: left;
+      transition: var(--transition);
+    }
+
+    .step-pill.active {
+      color: var(--text-main);
+      border-color: var(--text-main);
+      background: var(--bg-card);
+    }
+
+    .step-pill.done {
+      color: var(--text-muted);
+      border-color: var(--border-strong);
+    }
+
+    /* Result Details Card */
+    .result-workspace-card {
+      display: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-glass);
+      width: 100%;
+      max-width: 580px;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .variations-strip-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .variations-list {
+      display: flex;
+      gap: 0.6rem;
+      overflow-x: auto;
+      padding: 2px;
+    }
+
+    .var-thumb-card {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      border: 2px solid var(--border-subtle);
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+      transition: var(--transition);
+    }
+
+    .var-thumb-card:hover {
+      border-color: var(--border-strong);
+    }
+
+    .var-thumb-card.active {
+      border-color: var(--text-main);
+      box-shadow: 0 0 0 1px var(--text-main);
+    }
+
+    .var-thumb-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .var-thumb-num {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      background: rgba(0, 0, 0, 0.85);
+      color: #FFFFFF;
+      font-size: 0.6rem;
+      font-weight: 800;
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+
+    .mode-switch-bar {
+      display: flex;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 3px;
+    }
+
+    .mode-switch-btn {
+      flex: 1;
+      padding: 6px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .mode-switch-btn.active {
+      background: var(--text-main);
+      color: var(--bg-base);
+    }
+
+    .meta-tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .meta-tag-pill {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+    }
+
+    .live-overlay-box {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .overlay-inputs-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .caption-box-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .caption-field {
+      width: 100%;
+      min-height: 110px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      padding: 0.75rem;
+      font-family: inherit;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      outline: none;
+      resize: vertical;
+    }
+
+    .caption-field:focus {
+      border-color: var(--border-focus);
+    }
+
+    .hashtag-chips-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+
+    .hash-chip {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .actions-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .btn-action-primary-mono {
+      width: 100%;
+      padding: 0.85rem;
+      border-radius: var(--radius-md);
+      background: var(--btn-primary-bg);
+      border: 1px solid var(--text-main);
+      color: var(--btn-primary-text);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: var(--transition);
+    }
+
+    .btn-action-primary-mono:hover {
+      background: var(--btn-primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .action-sub-grid {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-action-secondary-mono {
+      flex: 1;
+      padding: 0.65rem;
+      border-radius: var(--radius-md);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: var(--transition);
+    }
+
+    .btn-action-secondary-mono:hover {
+      background: var(--text-main);
+      color: var(--bg-base);
+    }
+
+    .dropzone-box {
+      border: 1.5px dashed var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      background: var(--bg-input);
+    }
+
+    .dropzone-box:hover {
+      border-color: var(--border-focus);
+    }
+
+    /* History Grid */
+    .history-grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .history-item-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-glass);
+      transition: var(--transition);
+    }
+
+    .history-item-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-strong);
+    }
+
+    .history-img-box {
+      width: 100%;
+      height: 250px;
+      background: #000;
+      overflow: hidden;
+    }
+
+    .history-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .history-item-card:hover .history-img-box img {
+      transform: scale(1.03);
+    }
+
+    .history-info-box {
+      padding: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      flex: 1;
+    }
+
+    /* Toast */
+    #toastBar {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border: 1px solid var(--border-strong);
+      box-shadow: var(--shadow-glass);
+      border-radius: 999px;
+      padding: 0.75rem 1.4rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 10000;
+      pointer-events: none;
+    }
+
+    #toastBar.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 1120px) {
+      .studio-layout {
+        grid-template-columns: 420px 1fr;
+        gap: 1.5rem;
+      }
+    }
+
+    @media (max-width: 900px) {
+      header {
+        padding: 0.75rem 1rem;
+      }
+
+      .mobile-segment-bar {
+        display: block;
+      }
+
+      main {
+        padding: 1rem 0.75rem 2.5rem;
+      }
+
+      .studio-layout {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+      }
+
+      .studio-panel {
+        padding: 1.25rem;
+      }
+
+      .phone-simulator-card {
+        padding: 1.25rem 1rem;
+      }
+
+      .mobile-hide-form #panelForm {
+        display: none;
+      }
+
+      .mobile-hide-preview #panelPreview {
+        display: none;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .brand-titles h1 {
+        font-size: 1.05rem;
+      }
+
+      .brand-tag {
+        display: none;
+      }
+
+      .format-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .format-card {
+        flex-direction: row;
+        text-align: left;
+        padding: 0.75rem 1rem;
+        gap: 0.85rem;
+      }
+
+      .phone-device {
+        max-width: 100%;
+        border-width: 2px;
+        border-radius: var(--radius-lg);
+      }
+
+      #toastBar {
+        left: 1rem;
+        right: 1rem;
+        bottom: 1rem;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body class="mobile-hide-preview">
+
+  <!-- =========================================================
+       1. TAM EKRAN GİRİŞ SAYFASI (LOGIN SCREEN)
+       ========================================================= -->
+  <div id="viewLoginScreen">
+    <div class="login-container">
+      
+      <!-- SADECE BURADA İNSTAGRAM LOGO GRADYANI VARDIR -->
+      <div class="insta-brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      </div>
+
+      <h2 class="login-title">Sosyal Medya Otomasyon</h2>
+      <p class="login-subtitle">Instagram İçerik Stüdyosu — Yönetici Girişi</p>
+
+      <div id="loginErrorBox" class="login-error"></div>
+
+      <form onsubmit="handleLoginSubmit(event)">
+        <div class="login-field-group">
+          <label class="login-label" for="loginPasswordInput">Yönetim Şifresi</label>
+          <input type="password" id="loginPasswordInput" class="login-input" placeholder="Şifrenizi girin..." required autofocus>
+        </div>
+
+        <button type="submit" class="login-btn" id="btnLoginSubmit">
+          <span>Giriş Yap</span>
+        </button>
+      </form>
+
+      <div class="login-hint-text">
+        Varsayılan şifre: <code>admin</code> (.env dosyasından değiştirebilirsiniz)
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       2. ANA UYGULAMA (STUDIO & GALERİ)
+       ========================================================= -->
+  <div id="mainAppWrapper">
+    <!-- Header -->
+    <header>
+      <div class="brand-wrap" onclick="switchTab('studio')">
+        <!-- İKİNCİ VE SON RENKLİ ALAN: Header Logo -->
+        <div class="brand-logo-small">
+          <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </div>
+        <div class="brand-titles">
+          <h1>Sosyal Medya Otomasyon <span class="brand-tag">Instagram</span></h1>
+        </div>
+      </div>
+
+      <!-- Monochrome Nav Tabs -->
+      <div class="nav-tabs">
+        <button class="nav-tab-btn active" id="tabBtnStudio" onclick="switchTab('studio')">
+          Üretim Stüdyosu
+        </button>
+        <button class="nav-tab-btn" id="tabBtnHistory" onclick="switchTab('history')">
+          Çıktı Galerisi
+        </button>
+      </div>
+
+      <!-- Monochrome Right Controls -->
+      <div class="header-actions">
+        <button class="btn-mono" id="themeToggleBtn" onclick="toggleTheme()" title="Karanlık / Aydınlık Mod">
+          <span id="themeToggleIcon">☀️</span>
+          <span id="themeToggleLabel">Aydınlık</span>
+        </button>
+
+        <div class="status-badge-mono" id="apiStatusPill">
+          <span class="status-dot-mono" id="apiStatusDot"></span>
+          <span id="apiStatusText">Mock Modu</span>
+        </div>
+
+        <button class="btn-mono" id="btnLogout" onclick="handleLogout()" title="Oturumu Kapat">
+          🚪 Çıkış Yap
+        </button>
+      </div>
+    </header>
+
+    <!-- Mobile Segment Bar (< 900px) -->
+    <div class="mobile-segment-bar">
+      <div class="mobile-segment-inner">
+        <button class="mobile-seg-btn active" id="msegForm" onclick="switchMobileView('form')">
+          İçerik Editörü
+        </button>
+        <button class="mobile-seg-btn" id="msegPreview" onclick="switchMobileView('preview')">
+          Instagram Önizleme
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Container -->
+    <main>
+      <!-- TAB 1: ÜRETİM STÜDYOSU -->
+      <div class="tab-content active" id="tabStudio">
+        <div class="studio-layout">
+          
+          <!-- Sol Panel: Form -->
+          <div class="studio-panel" id="panelForm">
+            <div class="panel-header">
+              <div>
+                <div class="panel-header-title">
+                  <span>Gönderi Oluşturucu</span>
+                </div>
+                <div class="panel-header-subtitle">Instagram Gönderi, Hikaye & Reels Üretim Stüdyosu</div>
+              </div>
+            </div>
+
+            <form id="generateForm" onsubmit="handleGenerate(event)">
+              
+              <!-- 1. Konu / Tema -->
+              <div class="form-group">
+                <label class="form-label" for="inputTopic">
+                  <span>1. Ne Paylaşmak İstiyorsun? *</span>
+                  <span class="form-hint">3-200 karakter</span>
+                </label>
+                <input type="text" id="inputTopic" class="input-text" required
+                       placeholder="Örn: Yeni sezon soğuk kahve lansmanı..." oninput="syncLiveMockupTitle()">
+                
+                <!-- İlham Çipleri (Monochrome) -->
+                <div class="chips-row">
+                  <span class="chip-item" onclick="setTopicSuggestion('Yeni ürün tanıtımı ve lansman duyurusu')">☕ Yeni Ürün</span>
+                  <span class="chip-item" onclick="setTopicSuggestion('Hafta sonuna özel sürpriz indirim kampanyası')">⚡ İndirim</span>
+                  <span class="chip-item" onclick="setTopicSuggestion('Takipçilere özel pratik ipuçları')">💡 İpucu</span>
+                  <span class="chip-item" onclick="setTopicSuggestion('Müşteri memnuniyeti ve kullanıcı deneyimi')">⭐ Deneyim</span>
+                  <span class="chip-item" onclick="setTopicSuggestion('Günün ilham veren motivasyon kancası')">🎯 Motivasyon</span>
+                </div>
+              </div>
+
+              <!-- 2. Instagram Formatı -->
+              <div class="form-group">
+                <label class="form-label">
+                  <span>2. Instagram Formatı</span>
+                  <span class="form-hint">En uygun etkileşim boyutu</span>
+                </label>
+                <input type="hidden" id="inputFormat" value="post_4x5">
+                
+                <div class="format-grid">
+                  <!-- 4:5 Dikey Post -->
+                  <div class="format-card active" onclick="selectFormat('post_4x5', this)" id="fmt-post_4x5">
+                    <span class="format-card-badge">Önerilen</span>
+                    <div class="format-card-ratio">4:5</div>
+                    <div class="format-card-name">Dikey Post</div>
+                    <div class="format-card-res">1080 × 1350 px</div>
+                  </div>
+
+                  <!-- 1:1 Kare Post -->
+                  <div class="format-card" onclick="selectFormat('post_1x1', this)" id="fmt-post_1x1">
+                    <div class="format-card-ratio">1:1</div>
+                    <div class="format-card-name">Kare Post</div>
+                    <div class="format-card-res">1080 × 1080 px</div>
+                  </div>
+
+                  <!-- 9:16 Hikaye / Reels -->
+                  <div class="format-card" onclick="selectFormat('story_9x16', this)" id="fmt-story_9x16">
+                    <div class="format-card-ratio">9:16</div>
+                    <div class="format-card-name">Hikaye / Reels</div>
+                    <div class="format-card-res">1080 × 1920 px</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Görsel Atmosferi / Stil -->
+              <div class="form-group">
+                <label class="form-label" for="selectStyle">
+                  <span>3. Görsel Atmosferi & Tarzı</span>
+                </label>
+                <select id="selectStyle" class="select-input">
+                  <option value="lifestyle" selected>Yaşam Tarzı & Sıcak Atmosfer (Lifestyle)</option>
+                  <option value="minimalist">Minimalist & Temiz Stüdyo Estetiği</option>
+                  <option value="photorealistic">Gerçekçi Profesyonel Fotoğrafçılık</option>
+                  <option value="nature">Doğal, Organik & Açık Hava Tonları</option>
+                  <option value="luxury">Lüks, Şık & Kurumsal Prestij</option>
+                  <option value="cinematic">Sinematik Işık & Derin Gölgeler</option>
+                </select>
+              </div>
+
+              <!-- 4. Görsel Üzerindeki Başlık -->
+              <div class="form-group">
+                <label class="form-label" for="inputOverlay">
+                  <span>4. Görsel Üzerine Yazılacak Başlık (Opsiyonel)</span>
+                  <span class="form-hint" id="charCounter">0 / 60</span>
+                </label>
+                <input type="text" id="inputOverlay" class="input-text" maxlength="60"
+                       placeholder="Örn: Yeni Sezon, Yeni Lezzet..." oninput="updateCharCount(); syncLiveMockupTitle();">
+              </div>
+
+              <!-- 5. Firma Logosu & Konum Seçici -->
+              <div class="form-group">
+                <label class="form-label">
+                  <span>5. Firma Logosu & Konumu (Filigran - Opsiyonel)</span>
+                  <span class="form-hint">PNG / Şeffaf</span>
+                </label>
+                
+                <input type="file" id="fileLogo" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleLogoSelected(this)">
+
+                <div class="dropzone-box" id="logoDropzone" onclick="document.getElementById('fileLogo').click()" style="padding:0.9rem;">
+                  <div id="logoDropzoneLabel" style="display:flex; align-items:center; justify-content:center; gap:0.5rem; color:var(--text-muted);">
+                    <span style="font-size:1.1rem;">🏷️</span>
+                    <span style="font-size:0.78rem; font-weight:700;">Logo Yükleyin</span>
+                    <span style="font-size:0.68rem; color:var(--text-dim);">(PNG / Şeffaf önerilir)</span>
+                  </div>
+
+                  <div id="logoDropzonePreview" style="display:none; align-items:center; justify-content:space-between; gap:0.75rem;">
+                    <img id="logoThumb" src="" alt="Firma Logosu" style="width:36px; height:36px; border-radius:4px; object-fit:contain; background:#18181C; padding:2px;">
+                    <div style="flex:1; text-align:left; font-size:0.75rem;">
+                      <div id="logoFileName" style="font-weight:700; color:var(--text-main);">logo.png</div>
+                      <div id="logoFileSize" style="color:var(--text-dim); font-size:0.68rem;">0 KB</div>
+                    </div>
+                    <button type="button" class="btn-mono" onclick="removeLogoFile(event)" style="padding:2px 8px;">✕ Kaldır</button>
+                  </div>
+                </div>
+
+                <!-- Logo Konumu & Boyutu (Kullanıcı Seçimi) -->
+                <div id="logoControlsArea" style="display:none; margin-top:0.65rem;">
+                  <div style="font-size:0.74rem; font-weight:700; color:var(--text-main); margin-bottom:0.25rem;">
+                    Logonun Konumu (Tıklayarak Seçin)
+                  </div>
+                  <input type="hidden" id="inputLogoPosition" value="top-right">
+                  <div class="logo-pos-grid">
+                    <button type="button" class="pos-btn" onclick="selectLogoPosition('top-left', this)">↖ Sol Üst</button>
+                    <button type="button" class="pos-btn" onclick="selectLogoPosition('top-center', this)">⬆ Üst Orta</button>
+                    <button type="button" class="pos-btn active" onclick="selectLogoPosition('top-right', this)">↗ Sağ Üst</button>
+                    <button type="button" class="pos-btn" onclick="selectLogoPosition('bottom-left', this)">↙ Sol Alt</button>
+                    <button type="button" class="pos-btn" onclick="selectLogoPosition('center', this)">🎯 Orta (Filigran)</button>
+                    <button type="button" class="pos-btn" onclick="selectLogoPosition('bottom-right', this)">↘ Sağ Alt</button>
+                  </div>
+
+                  <!-- Boyut ve Opaklık Seçenekleri -->
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:0.65rem;">
+                    <div>
+                      <span style="font-size:0.7rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Logo Boyutu</span>
+                      <div class="pills-bar" style="padding:2px;">
+                        <button type="button" class="pill-btn" onclick="selectLogoScale('small', this)">Küçük</button>
+                        <button type="button" class="pill-btn active" onclick="selectLogoScale('medium', this)">Orta</button>
+                        <button type="button" class="pill-btn" onclick="selectLogoScale('large', this)">Büyük</button>
+                      </div>
+                    </div>
+                    <div>
+                      <span style="font-size:0.7rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Opaklık (Saydamlık)</span>
+                      <div class="pills-bar" style="padding:2px;">
+                        <button type="button" class="pill-btn active" onclick="selectLogoOpacity('1.0', this)">%100</button>
+                        <button type="button" class="pill-btn" onclick="selectLogoOpacity('0.8', this)">%80</button>
+                        <button type="button" class="pill-btn" onclick="selectLogoOpacity('0.5', this)">%50</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 6. Varyasyon Adedi -->
+              <div class="form-group">
+                <label class="form-label">6. Görsel Varyasyon Sayısı</label>
+                <input type="hidden" id="inputCount" value="2">
+                <div class="pills-bar">
+                  <button type="button" class="pill-btn" onclick="selectCount(1, this)">1 Adet</button>
+                  <button type="button" class="pill-btn active" onclick="selectCount(2, this)">2 Adet</button>
+                  <button type="button" class="pill-btn" onclick="selectCount(3, this)">3 Adet</button>
+                  <button type="button" class="pill-btn" onclick="selectCount(4, this)">4 Adet</button>
+                </div>
+              </div>
+
+              <!-- Gelişmiş Ayarlar & Sistem Promptu Çekmecesi -->
+              <div class="drawer-card" id="drawerAdvanced">
+                <div class="drawer-header" onclick="toggleDrawer('drawerAdvanced')">
+                  <div class="drawer-header-left">
+                    <span>⚙️ Sistem Promptu & Marka Ayarları</span>
+                  </div>
+                  <span id="drawerArrow" style="font-size:0.75rem; color:var(--text-muted);">▼</span>
+                </div>
+
+                <div class="drawer-body">
+                  <div class="form-group">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                      <label class="form-label" style="margin-bottom:0;" for="inputSystemPrompt">AI Sistem Promptu (Marka Dili)</label>
+                      <button type="button" class="btn-mono" style="padding:2px 8px; font-size:0.7rem;" onclick="resetSystemPrompt()">Varsayılana Sıfırla</button>
+                    </div>
+                    <textarea id="inputSystemPrompt" class="textarea-custom" style="min-height:95px; font-size:0.78rem;"
+                              placeholder="Instagram içerik üreticisi talimatları..."></textarea>
+                    <span class="form-hint" style="display:block; margin-top:4px;">Markanızın hitap tonunu, kural ve kancalarını buradan özelleştirebilirsiniz.</span>
+                  </div>
+
+                  <!-- Referans Görsel -->
+                  <div class="form-group">
+                    <label class="form-label">Referans Görsel (Stil Benzetme - Opsiyonel)</label>
+                    <input type="file" id="fileReference" accept="image/*" style="display:none;" onchange="handleFileSelected(this)">
+                    
+                    <div class="dropzone-box" id="dropzone" onclick="document.getElementById('fileReference').click()">
+                      <div id="dropzoneLabel" style="display:flex; flex-direction:column; align-items:center; gap:0.4rem; color:var(--text-muted);">
+                        <span style="font-size:1.3rem;">📁</span>
+                        <span style="font-size:0.78rem; font-weight:700;">Görsel seçin veya sürükleyin</span>
+                        <span style="font-size:0.68rem; color:var(--text-dim);">PNG, JPG (Maks. 10 MB)</span>
+                      </div>
+
+                      <div id="dropzonePreview" style="display:none; align-items:center; justify-content:space-between; gap:0.75rem;">
+                        <img id="refThumb" src="" alt="Referans" style="width:42px; height:42px; border-radius:6px; object-fit:cover;">
+                        <div style="flex:1; text-align:left; font-size:0.75rem;">
+                          <div id="refFileName" style="font-weight:700; color:var(--text-main);">dosya.jpg</div>
+                          <div id="refFileSize" style="color:var(--text-dim); font-size:0.68rem;">0 MB</div>
+                        </div>
+                        <button type="button" class="btn-mono" onclick="removeRefFile(event)">✕</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Model & Kalite -->
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-bottom:0.75rem;">
+                    <div>
+                      <label class="form-label" for="selectProvider">AI Modeli</label>
+                      <select id="selectProvider" class="select-input" style="font-size:0.78rem; padding:0.55rem;">
+                        <option value="openai" selected>OpenAI (DALL-E 3)</option>
+                        <option value="flux">Black Forest Flux Pro</option>
+                        <option value="anthropic">Claude Sonnet 3.5</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="form-label" for="selectQuality">Kalite</label>
+                      <select id="selectQuality" class="select-input" style="font-size:0.78rem; padding:0.55rem;">
+                        <option value="standard" selected>Standart (Hızlı)</option>
+                        <option value="hd">Ultra HD (Yüksek Detay)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <input type="hidden" id="selectRefMode" value="style">
+                  <input type="hidden" id="inputNotes" value="">
+
+                  <!-- Mock Checkbox -->
+                  <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.4rem;">
+                    <input type="checkbox" id="checkMock" style="accent-color:#FFFFFF; width:15px; height:15px;">
+                    <label for="checkMock" style="font-size:0.75rem; color:var(--text-muted); cursor:pointer;">
+                      Mock Test Modu (API Harcamadan Test Et)
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submit Button (Black & White) -->
+              <button type="submit" class="btn-create-mono" id="btnSubmit">
+                <span>Instagram Paketini Üret</span>
+              </button>
+              <div style="text-align:center; margin-top:0.5rem; font-size:0.7rem; color:var(--text-dim);">
+                Görsel tuval boyutu ve Türkçe caption anında üretilir.
+              </div>
+
+            </form>
+          </div>
+
+          <!-- Sağ Panel: Canlı Instagram Önizleme Simülatörü (Monochrome) -->
+          <div class="preview-canvas-wrapper" id="panelPreview">
+            
+            <!-- Loading Stepper Box -->
+            <div class="loading-stepper-box" id="viewLoading">
+              <div class="loading-spin-ring"></div>
+              <h3 style="font-family:'Outfit',sans-serif; font-size:1.35rem; font-weight:800; color:var(--text-main); margin-bottom:0.4rem;">
+                Instagram İçeriğiniz Üretiliyor
+              </h3>
+              <p style="font-size:0.85rem; color:var(--text-muted);">
+                Görsel varyasyonları, marka kancaları ve Instagram tuval yerleşimi hazırlanıyor...
+              </p>
+
+              <div class="steps-container">
+                <div class="step-pill" id="step1">
+                  <span>1️⃣</span> <span>Türkçe kanca ve caption kurgulanıyor</span>
+                </div>
+                <div class="step-pill" id="step2">
+                  <span>2️⃣</span> <span>Yapay zeka görseli oluşturuluyor</span>
+                </div>
+                <div class="step-pill" id="step3">
+                  <span>3️⃣</span> <span>Instagram tuvaline boyutlandırılıyor</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Instagram Telefon Simülatörü (Monochrome Çerçeve) -->
+            <div class="phone-simulator-card" id="phoneWrapper">
+              
+              <div class="phone-device">
+                <div class="phone-notch-bar">
+                  <div class="phone-island">
+                    <div class="phone-island-dot"></div>
+                  </div>
+                </div>
+
+                <div class="insta-phone-header">
+                  <div class="insta-user-info">
+                    <div class="insta-avatar">
+                      <div class="insta-avatar-inner">SM</div>
+                    </div>
+                    <div class="insta-usernames">
+                      <div class="insta-handle">
+                        <span>sosyalmedya</span>
+                        <svg class="insta-verified" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                      </div>
+                      <span class="insta-subtext" id="instaLiveFormatBadge">Instagram Dikey Post • 1080×1350</span>
+                    </div>
+                  </div>
+                  <div class="insta-dots">•••</div>
+                </div>
+
+                <!-- Instagram Media Viewport -->
+                <div class="insta-media-viewport aspect-4x5" id="instaMediaBox" style="position:relative; overflow:hidden;">
+                  
+                  <!-- Boş Durumdaki Canlı Mockup (Monochrome) -->
+                  <div class="insta-idle-canvas" id="idleCanvas">
+                    <span class="idle-ratio-badge" id="idleRatioBadge">4:5 • 1080 × 1350 PX</span>
+                    <div class="idle-live-title" id="idleLiveTitle">
+                      Yeni Sezon Kahve Lansmanı
+                    </div>
+                    <div class="idle-sub-tip">
+                      Sol taraftaki konuyu değiştirerek veya format seçerek bu canlı önizlemeyi anlık izleyin.
+                    </div>
+                  </div>
+
+                  <!-- Üretilen Görsel -->
+                  <img id="activeMainImg" class="insta-media-img" src="" alt="Üretilen Gönderi" style="display:none;">
+
+                  <!-- Canlı Firma Logosu Önizlemesi (Kullanıcı Seçimine Göre Konumlanır) -->
+                  <img id="liveLogoPreview" src="" alt="Firma Logosu" style="display:none; position:absolute; z-index:15; pointer-events:none; transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1); object-fit:contain;">
+
+                </div>
+
+                <!-- Instagram Alt Butonları -->
+                <div class="insta-actions-row">
+                  <div class="insta-actions-left">
+                    <svg class="insta-action-icon" viewBox="0 0 24 24">
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    <svg class="insta-action-icon" viewBox="0 0 24 24">
+                      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                    </svg>
+                    <svg class="insta-action-icon" viewBox="0 0 24 24">
+                      <line x1="22" y1="2" x2="11" y2="13"></line>
+                      <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                  </div>
+                  <svg class="insta-action-icon" viewBox="0 0 24 24">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </div>
+
+                <!-- Instagram Caption & Beğeni -->
+                <div class="insta-phone-caption-area">
+                  <div class="insta-likes-count">2.842 beğenme</div>
+                  <div class="insta-caption-text" id="instaPhoneCaption">
+                    <strong>sosyalmedya</strong> <span id="instaPhoneCaptionText">Görsel üretildiğinde yapay zeka tarafından markanız için kurgulanan vurucu kanca ve etkili Türkçe Instagram açıklaması burada görünecektir... #instagram #sosyalmedya</span>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Üretim Tamamlandığında Çalışma Alanı (Monochrome) -->
+              <div class="result-workspace-card" id="viewResults" style="margin-top:1.5rem;">
+                
+                <div class="variations-strip-wrap">
+                  <div style="font-size:0.8rem; font-weight:800; color:var(--text-main);" id="lblVariantCount">
+                    Varyasyonlar
+                  </div>
+                  <div class="variations-list" id="galleryStrip"></div>
+                </div>
+
+                <div class="mode-switch-bar">
+                  <button type="button" class="mode-switch-btn active" id="vbtnFinal" onclick="toggleVisualMode('final')">
+                    Metinli Final Görsel
+                  </button>
+                  <button type="button" class="mode-switch-btn" id="vbtnBackground" onclick="toggleVisualMode('bg')">
+                    Sade Arka Plan
+                  </button>
+                </div>
+
+                <div class="meta-tags-row">
+                  <span class="meta-tag-pill" id="badgeCost">Maliyet: $0.00</span>
+                  <span class="meta-tag-pill" id="badgeFormat">Instagram 4:5</span>
+                  <span class="meta-tag-pill" id="badgePostDir">post-1</span>
+                </div>
+
+                <div class="live-overlay-box">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                    <span style="font-size:0.75rem; font-weight:700; color:var(--text-main);">Görsel Metni & Logo Konumunu Düzenle</span>
+                    <span style="font-size:0.68rem; color:var(--text-dim);">API harcamadan anında yeniler</span>
+                  </div>
+                  <div class="overlay-inputs-row" style="flex-wrap:wrap; gap:0.4rem;">
+                    <input type="text" id="quickOverlayInput" class="input-text" style="flex:2; min-width:140px; padding:0.45rem 0.65rem; font-size:0.78rem;" placeholder="Görsel üzerindeki metin...">
+                    <select id="quickAlignSelect" class="select-input" style="flex:1; min-width:80px; padding:0.45rem; font-size:0.75rem;" title="Metin Hizalaması">
+                      <option value="center">Metin: Orta</option>
+                      <option value="left">Metin: Sol</option>
+                      <option value="right">Metin: Sağ</option>
+                    </select>
+                    <select id="quickLogoPosSelect" class="select-input" style="flex:1; min-width:105px; padding:0.45rem; font-size:0.75rem;" title="Logo Konumu">
+                      <option value="top-right">Logo: ↗ Sağ Üst</option>
+                      <option value="top-left">Logo: ↖ Sol Üst</option>
+                      <option value="top-center">Logo: ⬆ Üst Orta</option>
+                      <option value="bottom-right">Logo: ↘ Sağ Alt</option>
+                      <option value="bottom-left">Logo: ↙ Sol Alt</option>
+                      <option value="center">Logo: 🎯 Orta</option>
+                    </select>
+                    <button type="button" class="btn-action-secondary-mono" style="flex:none; padding:0.45rem 12px;" onclick="applyQuickOverlay()">
+                      Yenile
+                    </button>
+                  </div>
+                </div>
+
+                <div class="caption-box-wrap">
+                  <label class="form-label" for="activeCaption" style="margin-bottom:0;">
+                    <span>Instagram Açıklama Metni (Caption)</span>
+                    <span class="form-hint">Düzenlenebilir</span>
+                  </label>
+                  <textarea id="activeCaption" class="caption-field" oninput="syncLiveCaptionToPhone()"></textarea>
+                </div>
+
+                <div>
+                  <div style="font-size:0.78rem; font-weight:800; color:var(--text-main); margin-bottom:0.35rem;">Hashtag'ler</div>
+                  <div class="hashtag-chips-wrap" id="hashtagsList"></div>
+                </div>
+
+                <div class="actions-grid">
+                  <button type="button" class="btn-action-primary-mono" id="btnDownloadActive" onclick="downloadActiveImage()">
+                    ⬇️ İndir (Instagram Post 1080×1350)
+                  </button>
+                  
+                  <div class="action-sub-grid">
+                    <button type="button" class="btn-action-secondary-mono" onclick="copyCaptionAndTags()">
+                      📋 Caption'ı Kopyala
+                    </button>
+                    <button type="button" class="btn-action-secondary-mono" onclick="saveActivePost()">
+                      💾 Klasöre Kaydet
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB 2: ÇIKTI GALERİSİ -->
+      <div class="tab-content" id="tabHistory">
+        <div class="studio-panel" style="margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+          <div>
+            <div style="display:flex; align-items:center; gap:0.6rem;">
+              <h2 style="font-family:'Outfit',sans-serif; font-size:1.35rem; font-weight:800; color:var(--text-main);">Kayıtlı Instagram Gönderileri</h2>
+              <span id="historyCountBadge" class="meta-tag-pill" style="font-size:0.72rem; padding:2px 8px;">0 / 20 Tarayıcı Hafızası</span>
+            </div>
+            <div style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Tarayıcı hafızasında (IndexedDB) ve varsa sunucu outputs/ klasöründe depolanan Instagram içerikleri</div>
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <button type="button" class="btn-mono" onclick="clearLocalHistory()">
+              🗑️ Hafızayı Temizle
+            </button>
+            <button type="button" class="btn-mono" onclick="loadHistory()">
+              🔄 Yenile
+            </button>
+          </div>
+        </div>
+
+        <div class="history-grid-container" id="historyGrid"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastBar">
+    <span id="toastIcon">●</span>
+    <span id="toastText">İşlem başarılı</span>
+  </div>
+
+  <script>
+    // Theme Management (Monochrome Dark & Light)
+    function initTheme() {
+      const savedTheme = localStorage.getItem('socialcraft_theme') || 'dark';
+      setTheme(savedTheme);
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      setTheme(next);
+    }
+
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('socialcraft_theme', theme);
+      const icon = document.getElementById('themeToggleIcon');
+      const label = document.getElementById('themeToggleLabel');
+      if (icon && label) {
+        if (theme === 'light') {
+          icon.innerText = '🌙';
+          label.innerText = 'Karanlık';
+        } else {
+          icon.innerText = '☀️';
+          label.innerText = 'Aydınlık';
+        }
+      }
+    }
+
+    // XSS Sanitizer
+    function esc(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // State
+    let currentResult = null;
+    let activePostIndex = 0;
+    let visualMode = 'final';
+    let selectedRefFile = null;
+    let defaultSystemPrompt = '';
+    let selectedLogoFile = null;
+    let selectedLogoPosition = 'top-right';
+    let selectedLogoScale = 'medium';
+    let selectedLogoOpacity = '1.0';
+
+    // IndexedDB: Tarayıcı İçi Çıktı Hafızası (Stateless / Vercel Uyumlu)
+    const StudioDB = {
+      dbName: 'SosyalMedyaStudioDB',
+      version: 1,
+      storeName: 'saved_posts',
+
+      async getDB() {
+        return new Promise((resolve, reject) => {
+          if (!window.indexedDB) {
+            return reject(new Error('IndexedDB not supported'));
+          }
+          const req = indexedDB.open(this.dbName, this.version);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(this.storeName)) {
+              const store = db.createObjectStore(this.storeName, { keyPath: 'id', autoIncrement: true });
+              store.createIndex('created_at', 'created_at', { unique: false });
+            }
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      },
+
+      async savePost(postItem) {
+        try {
+          const db = await this.getDB();
+          const tx = db.transaction(this.storeName, 'readwrite');
+          const store = tx.objectStore(this.storeName);
+          store.add(postItem);
+
+          // Son 20 adetten fazlasını otomatik temizle
+          const countReq = store.count();
+          countReq.onsuccess = () => {
+            if (countReq.result > 20) {
+              const openCursor = store.openCursor();
+              let toDelete = countReq.result - 20;
+              openCursor.onsuccess = (ev) => {
+                const cursor = ev.target.result;
+                if (cursor && toDelete > 0) {
+                  store.delete(cursor.primaryKey);
+                  toDelete--;
+                  cursor.continue();
+                }
+              };
+            }
+          };
+        } catch (err) {
+          console.warn('IndexedDB save failed:', err);
+        }
+      },
+
+      async getAll() {
+        return new Promise(async (resolve) => {
+          try {
+            const db = await this.getDB();
+            const tx = db.transaction(this.storeName, 'readonly');
+            const store = tx.objectStore(this.storeName);
+            const req = store.getAll();
+            req.onsuccess = () => resolve((req.result || []).reverse());
+            req.onerror = () => resolve([]);
+          } catch {
+            resolve([]);
+          }
+        });
+      },
+
+      async deletePost(id) {
+        try {
+          const db = await this.getDB();
+          const tx = db.transaction(this.storeName, 'readwrite');
+          tx.objectStore(this.storeName).delete(id);
+        } catch (err) {
+          console.warn('IndexedDB delete failed:', err);
+        }
+      },
+
+      async clearAll() {
+        try {
+          const db = await this.getDB();
+          const tx = db.transaction(this.storeName, 'readwrite');
+          tx.objectStore(this.storeName).clear();
+        } catch (err) {
+          console.warn('IndexedDB clear failed:', err);
+        }
+      }
+    };
+
+    initTheme();
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      initTheme();
+      await checkAuthAndConfig();
+      syncLiveMockupTitle();
+      updateDownloadButtonLabel();
+    });
+
+    // 1. Auth & Config Checking
+    async function checkAuthAndConfig() {
+      try {
+        const res = await fetch('/api/config');
+        if (res.status === 401) {
+          // Oturum yok/yetkisiz: config yerine yalnızca giriş ekranı göster
+          document.getElementById('viewLoginScreen').style.display = 'flex';
+          document.getElementById('mainAppWrapper').style.display = 'none';
+          return;
+        }
+        const data = await res.json();
+
+        const loginScreen = document.getElementById('viewLoginScreen');
+        const mainApp = document.getElementById('mainAppWrapper');
+
+        if (data.auth && data.auth.required) {
+          if (!data.auth.logged_in) {
+            // Kullanıcı giriş yapmamış -> Login ekranını göster
+            loginScreen.style.display = 'flex';
+            mainApp.style.display = 'none';
+            return;
+          }
+        }
+
+        // Giriş yapılmış veya auth kapalı -> Ana uygulamayı göster
+        loginScreen.style.display = 'none';
+        mainApp.style.display = 'flex';
+
+        // Varsayılan sistem promptu
+        defaultSystemPrompt = data.default_system_prompt || '';
+        const sysPromptInput = document.getElementById('inputSystemPrompt');
+        if (sysPromptInput && !sysPromptInput.value.trim()) {
+          sysPromptInput.value = defaultSystemPrompt;
+        }
+
+        // API Status Pill (Monochrome)
+        const apiText = document.getElementById('apiStatusText');
+        if (data.keys && (data.keys.openai || data.keys.anthropic)) {
+          apiText.innerText = 'API Aktif';
+          document.getElementById('checkMock').checked = false;
+        } else {
+          apiText.innerText = 'Mock Modu';
+          document.getElementById('checkMock').checked = true;
+        }
+
+      } catch (err) {
+        console.error('Config fetch failed:', err);
+      }
+    }
+
+    // Login Form Submit
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const password = document.getElementById('loginPasswordInput').value;
+      const errorBox = document.getElementById('loginErrorBox');
+      const btn = document.getElementById('btnLoginSubmit');
+      
+      errorBox.style.display = 'none';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.detail || 'Hatalı şifre.');
+        }
+
+        document.getElementById('loginPasswordInput').value = '';
+        showToast('Giriş başarılı!', '✓');
+        await checkAuthAndConfig();
+      } catch (err) {
+        errorBox.innerText = err.message;
+        errorBox.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // Logout
+    async function handleLogout() {
+      try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        showToast('Oturum kapatıldı.', '●');
+        document.getElementById('viewLoginScreen').style.display = 'flex';
+        document.getElementById('mainAppWrapper').style.display = 'none';
+        document.getElementById('loginPasswordInput').focus();
+      } catch (err) {
+        console.error('Logout error:', err);
+      }
+    }
+
+    // UI Helpers
+    function toggleDrawer(id) {
+      const el = document.getElementById(id);
+      el.classList.toggle('open');
+      const arrow = document.getElementById('drawerArrow');
+      if (arrow) {
+        arrow.innerText = el.classList.contains('open') ? '▲' : '▼';
+      }
+    }
+
+    function resetSystemPrompt() {
+      const sysPromptInput = document.getElementById('inputSystemPrompt');
+      if (sysPromptInput) {
+        sysPromptInput.value = defaultSystemPrompt;
+        showToast('Sistem promptu varsayılana sıfırlandı.', '↺');
+      }
+    }
+
+    function setTopicSuggestion(text) {
+      const topicInput = document.getElementById('inputTopic');
+      topicInput.value = text;
+      syncLiveMockupTitle();
+      topicInput.focus();
+    }
+
+    function syncLiveMockupTitle() {
+      const topic = document.getElementById('inputTopic').value.trim();
+      const overlay = document.getElementById('inputOverlay').value.trim();
+      const titleElem = document.getElementById('idleLiveTitle');
+      if (overlay) {
+        titleElem.innerText = overlay;
+      } else if (topic) {
+        titleElem.innerText = topic;
+      } else {
+        titleElem.innerText = 'Yeni Sezon Kahve Lansmanı';
+      }
+    }
+
+    function syncLiveCaptionToPhone() {
+      const text = document.getElementById('activeCaption').value;
+      const capSpan = document.getElementById('instaPhoneCaptionText');
+      if (capSpan) {
+        capSpan.innerText = text || 'Görsel açıklaması...';
+      }
+    }
+
+    function selectFormat(fmt, el) {
+      document.querySelectorAll('.format-card').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('inputFormat').value = fmt;
+
+      const mediaBox = document.getElementById('instaMediaBox');
+      const badgeLive = document.getElementById('instaLiveFormatBadge');
+      const idleBadge = document.getElementById('idleRatioBadge');
+
+      mediaBox.classList.remove('aspect-4x5', 'aspect-1x1', 'aspect-9x16');
+
+      if (fmt === 'post_4x5') {
+        mediaBox.classList.add('aspect-4x5');
+        badgeLive.innerText = 'Instagram Dikey Post • 1080×1350';
+        idleBadge.innerText = '4:5 • 1080 × 1350 PX';
+      } else if (fmt === 'post_1x1') {
+        mediaBox.classList.add('aspect-1x1');
+        badgeLive.innerText = 'Instagram Kare Post • 1080×1080';
+        idleBadge.innerText = '1:1 • 1080 × 1080 PX';
+      } else {
+        mediaBox.classList.add('aspect-9x16');
+        badgeLive.innerText = 'Instagram Story / Reels • 1080×1920';
+        idleBadge.innerText = '9:16 • 1080 × 1920 PX';
+      }
+
+      updateDownloadButtonLabel();
+    }
+
+    function updateDownloadButtonLabel() {
+      const fmt = document.getElementById('inputFormat').value || 'post_4x5';
+      const btn = document.getElementById('btnDownloadActive');
+      if (!btn) return;
+      const labels = {
+        'post_4x5': '⬇️ İndir (Instagram Post 1080×1350)',
+        'post_1x1': '⬇️ İndir (Instagram Post 1080×1080)',
+        'story_9x16': '⬇️ İndir (Instagram Story 1080×1920)',
+        'reels_cover_9x16': '⬇️ İndir (Instagram Reels 1080×1920)'
+      };
+      btn.innerHTML = labels[fmt] || '⬇️ İndir (Instagram Görseli)';
+    }
+
+    function selectCount(count, el) {
+      document.querySelectorAll('.pills-bar .pill-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('inputCount').value = count;
+    }
+
+    function updateCharCount() {
+      const val = document.getElementById('inputOverlay').value;
+      document.getElementById('charCounter').innerText = `${val.length} / 60`;
+    }
+
+    // Drag and Drop
+    const dropzone = document.getElementById('dropzone');
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--text-main)'; });
+    dropzone.addEventListener('dragleave', () => dropzone.style.borderColor = 'var(--border-strong)');
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.style.borderColor = 'var(--border-strong)';
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    function handleFileSelected(input) {
+      if (input.files && input.files[0]) {
+        handleFile(input.files[0]);
+      }
+    }
+
+    function handleFile(file) {
+      selectedRefFile = file;
+      document.getElementById('dropzoneLabel').style.display = 'none';
+      const preview = document.getElementById('dropzonePreview');
+      preview.style.display = 'flex';
+      document.getElementById('refFileName').innerText = file.name;
+      document.getElementById('refFileSize').innerText = `${(file.size / (1024*1024)).toFixed(1)} MB`;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('refThumb').src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeRefFile(e) {
+      e.stopPropagation();
+      selectedRefFile = null;
+      document.getElementById('fileReference').value = '';
+      document.getElementById('dropzoneLabel').style.display = 'flex';
+      document.getElementById('dropzonePreview').style.display = 'none';
+    }
+
+    // Logo Upload & Interactive Positioning
+    const logoDropzone = document.getElementById('logoDropzone');
+    if (logoDropzone) {
+      logoDropzone.addEventListener('dragover', (e) => { e.preventDefault(); logoDropzone.style.borderColor = 'var(--text-main)'; });
+      logoDropzone.addEventListener('dragleave', () => logoDropzone.style.borderColor = 'var(--border-strong)');
+      logoDropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        logoDropzone.style.borderColor = 'var(--border-strong)';
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+          handleLogoFile(e.dataTransfer.files[0]);
+        }
+      });
+    }
+
+    function handleLogoSelected(input) {
+      if (input.files && input.files[0]) {
+        handleLogoFile(input.files[0]);
+      }
+    }
+
+    function handleLogoFile(file) {
+      selectedLogoFile = file;
+      document.getElementById('logoDropzoneLabel').style.display = 'none';
+      const preview = document.getElementById('logoDropzonePreview');
+      preview.style.display = 'flex';
+      document.getElementById('logoFileName').innerText = file.name;
+      const sizeKb = (file.size / 1024).toFixed(0);
+      document.getElementById('logoFileSize').innerText = sizeKb > 1024 ? `${(file.size / (1024*1024)).toFixed(1)} MB` : `${sizeKb} KB`;
+
+      document.getElementById('logoControlsArea').style.display = 'block';
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('logoThumb').src = e.target.result;
+        const liveLogo = document.getElementById('liveLogoPreview');
+        if (liveLogo) {
+          liveLogo.src = e.target.result;
+          liveLogo.style.display = 'block';
+          updateLiveLogoPreview();
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeLogoFile(e) {
+      if (e) e.stopPropagation();
+      selectedLogoFile = null;
+      document.getElementById('fileLogo').value = '';
+      document.getElementById('logoDropzoneLabel').style.display = 'flex';
+      document.getElementById('logoDropzonePreview').style.display = 'none';
+      document.getElementById('logoControlsArea').style.display = 'none';
+      const liveLogo = document.getElementById('liveLogoPreview');
+      if (liveLogo) {
+        liveLogo.style.display = 'none';
+        liveLogo.src = '';
+      }
+    }
+
+    function selectLogoPosition(pos, el) {
+      selectedLogoPosition = pos;
+      document.querySelectorAll('.logo-pos-grid .pos-btn').forEach(b => b.classList.remove('active'));
+      if (el) el.classList.add('active');
+      document.getElementById('inputLogoPosition').value = pos;
+      const qSelect = document.getElementById('quickLogoPosSelect');
+      if (qSelect) qSelect.value = pos;
+      updateLiveLogoPreview();
+    }
+
+    function selectLogoScale(scale, el) {
+      selectedLogoScale = scale;
+      if (el && el.parentElement) {
+        el.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+      }
+      updateLiveLogoPreview();
+    }
+
+    function selectLogoOpacity(opacity, el) {
+      selectedLogoOpacity = opacity;
+      if (el && el.parentElement) {
+        el.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+      }
+      updateLiveLogoPreview();
+    }
+
+    function updateLiveLogoPreview() {
+      const liveLogo = document.getElementById('liveLogoPreview');
+      if (!liveLogo || !selectedLogoFile) return;
+
+      // Boyut
+      const scaleMap = { 'small': '13%', 'medium': '18%', 'large': '26%' };
+      const maxDim = scaleMap[selectedLogoScale] || '18%';
+      liveLogo.style.maxWidth = maxDim;
+      liveLogo.style.maxHeight = maxDim;
+
+      // Opaklık
+      liveLogo.style.opacity = selectedLogoOpacity;
+
+      // Konum
+      const margin = '14px';
+      liveLogo.style.top = 'auto';
+      liveLogo.style.bottom = 'auto';
+      liveLogo.style.left = 'auto';
+      liveLogo.style.right = 'auto';
+      liveLogo.style.transform = 'none';
+
+      switch (selectedLogoPosition) {
+        case 'top-left':
+          liveLogo.style.top = margin;
+          liveLogo.style.left = margin;
+          break;
+        case 'top-center':
+          liveLogo.style.top = margin;
+          liveLogo.style.left = '50%';
+          liveLogo.style.transform = 'translateX(-50%)';
+          break;
+        case 'top-right':
+          liveLogo.style.top = margin;
+          liveLogo.style.right = margin;
+          break;
+        case 'bottom-left':
+          liveLogo.style.bottom = margin;
+          liveLogo.style.left = margin;
+          break;
+        case 'bottom-right':
+          liveLogo.style.bottom = margin;
+          liveLogo.style.right = margin;
+          break;
+        case 'center':
+          liveLogo.style.top = '50%';
+          liveLogo.style.left = '50%';
+          liveLogo.style.transform = 'translate(-50%, -50%)';
+          break;
+        default:
+          liveLogo.style.top = margin;
+          liveLogo.style.right = margin;
+          break;
+      }
+    }
+
+    // Tab Switchers
+    function switchTab(tab) {
+      document.getElementById('tabBtnStudio').classList.toggle('active', tab === 'studio');
+      document.getElementById('tabBtnHistory').classList.toggle('active', tab === 'history');
+      document.getElementById('tabStudio').classList.toggle('active', tab === 'studio');
+      document.getElementById('tabHistory').classList.toggle('active', tab === 'history');
+      if (tab === 'history') {
+        loadHistory();
+      }
+    }
+
+    function switchMobileView(view) {
+      const isForm = view === 'form';
+      document.getElementById('msegForm').classList.toggle('active', isForm);
+      document.getElementById('msegPreview').classList.toggle('active', !isForm);
+      document.body.classList.toggle('mobile-hide-preview', isForm);
+      document.body.classList.toggle('mobile-hide-form', !isForm);
+    }
+
+    // Generate Request
+    async function handleGenerate(e) {
+      e.preventDefault();
+      const topic = document.getElementById('inputTopic').value.trim();
+      if (!topic) return;
+
+      const submitBtn = document.getElementById('btnSubmit');
+      submitBtn.disabled = true;
+
+      if (window.innerWidth <= 900) {
+        switchMobileView('preview');
+      }
+
+      document.getElementById('phoneWrapper').style.display = 'none';
+      document.getElementById('viewLoading').style.display = 'block';
+
+      animateStep(1);
+      setTimeout(() => animateStep(2), 1200);
+      setTimeout(() => animateStep(3), 2600);
+
+      const formData = new FormData();
+      formData.append('topic', topic);
+      formData.append('system_prompt', document.getElementById('inputSystemPrompt').value.trim());
+      formData.append('image_count', document.getElementById('inputCount').value);
+      formData.append('format', document.getElementById('inputFormat').value);
+      formData.append('style', document.getElementById('selectStyle').value);
+      formData.append('overlay_text_val', document.getElementById('inputOverlay').value.trim());
+      formData.append('notes', document.getElementById('inputNotes').value.trim());
+      formData.append('provider', document.getElementById('selectProvider').value);
+      formData.append('quality', document.getElementById('selectQuality').value);
+      formData.append('reference_mode', document.getElementById('selectRefMode').value);
+      formData.append('mock', document.getElementById('checkMock').checked);
+
+      if (selectedRefFile) {
+        formData.append('reference_file', selectedRefFile);
+      }
+
+      if (selectedLogoFile) {
+        formData.append('logo_file', selectedLogoFile);
+        formData.append('logo_position', selectedLogoPosition);
+        formData.append('logo_scale', selectedLogoScale);
+        formData.append('logo_opacity', selectedLogoOpacity);
+      }
+
+      try {
+        const res = await fetch('/api/generate', { method: 'POST', body: formData });
+        if (res.status === 401) {
+          showToast('Oturum süresi doldu. Lütfen tekrar giriş yapın.', '🔒');
+          await checkAuthAndConfig();
+          return;
+        }
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.detail || 'Üretim sırasında hata oluştu.');
+        }
+
+        const data = await res.json();
+        currentResult = data;
+        activePostIndex = 0;
+        renderResults();
+
+        // Her varyasyonu tarayıcı IndexedDB hafızasına kaydet (son 20 adedi saklar)
+        if (data.posts && data.posts.length) {
+          const todayStr = new Date().toLocaleDateString('tr-TR');
+          data.posts.forEach((p, idx) => {
+            StudioDB.savePost({
+              date: todayStr,
+              format: document.getElementById('inputFormat').value,
+              format_name: `${idx + 1}. Varyasyon`,
+              topic: topic,
+              caption: data.caption,
+              hashtags: data.hashtags,
+              final_url: p.final_data_url || p.final_url,
+              background_url: p.background_data_url || p.background_url,
+              created_at: Date.now() + idx
+            });
+          });
+        }
+
+        showToast('Instagram gönderi paketi hazır!', '✓');
+      } catch (err) {
+        alert('HATA: ' + err.message);
+        document.getElementById('phoneWrapper').style.display = 'flex';
+      } finally {
+        submitBtn.disabled = false;
+        document.getElementById('viewLoading').style.display = 'none';
+      }
+    }
+
+    function animateStep(stepNum) {
+      for (let i = 1; i <= 3; i++) {
+        const el = document.getElementById('step' + i);
+        if (i < stepNum) el.className = 'step-pill done';
+        else if (i === stepNum) el.className = 'step-pill active';
+        else el.className = 'step-pill';
+      }
+    }
+
+    function renderResults() {
+      if (!currentResult || !currentResult.posts.length) return;
+
+      document.getElementById('phoneWrapper').style.display = 'flex';
+      document.getElementById('idleCanvas').style.display = 'none';
+      document.getElementById('activeMainImg').style.display = 'block';
+      const liveLogo = document.getElementById('liveLogoPreview');
+      if (liveLogo) liveLogo.style.display = 'none'; // Görsele gömüldüğü için simülatör üstündeki canlı katmanı gizle
+      document.getElementById('viewResults').style.display = 'flex';
+
+      document.getElementById('lblVariantCount').innerText = `${currentResult.posts.length} Varyasyon Üretildi`;
+
+      const strip = document.getElementById('galleryStrip');
+      strip.innerHTML = '';
+      currentResult.posts.forEach((p, idx) => {
+        const card = document.createElement('div');
+        card.className = `var-thumb-card ${idx === activePostIndex ? 'active' : ''}`;
+        card.onclick = () => selectVariation(idx);
+        card.innerHTML = `
+          <img src="${p.final_url}" alt="Varyasyon ${idx + 1}">
+          <span class="var-thumb-num">#${idx + 1}</span>
+        `;
+        strip.appendChild(card);
+      });
+
+      selectVariation(activePostIndex);
+    }
+
+    function selectVariation(idx) {
+      activePostIndex = idx;
+      const post = currentResult.posts[idx];
+      if (!post) return;
+
+      document.querySelectorAll('.var-thumb-card').forEach((card, i) => {
+        card.classList.toggle('active', i === idx);
+      });
+
+      visualMode = 'final';
+      updateVisualToggleUI();
+      document.getElementById('activeMainImg').src = post.final_url;
+
+      const meta = post.meta || {};
+      document.getElementById('badgeCost').innerText = `Maliyet: $${(currentResult.cost ? currentResult.cost.total_usd : 0).toFixed(4)}`;
+      document.getElementById('badgeFormat').innerText = `Format: ${meta.format || document.getElementById('inputFormat').value}`;
+      document.getElementById('badgePostDir').innerText = post.rel_dir ? post.rel_dir.split('/').pop() : 'post';
+
+      document.getElementById('activeCaption').value = currentResult.caption || '';
+      document.getElementById('quickOverlayInput').value = (meta.payload && meta.payload.overlay_text) || document.getElementById('inputOverlay').value;
+
+      if (meta.payload && meta.payload.logo_position) {
+        const qLogoSelect = document.getElementById('quickLogoPosSelect');
+        if (qLogoSelect) qLogoSelect.value = meta.payload.logo_position;
+      }
+
+      syncLiveCaptionToPhone();
+      renderHashtags(currentResult.hashtags || []);
+      updateDownloadButtonLabel();
+    }
+
+
+    function renderHashtags(tags) {
+      const container = document.getElementById('hashtagsList');
+      container.innerHTML = '';
+      tags.forEach((tag, idx) => {
+        const chip = document.createElement('span');
+        chip.className = 'hash-chip';
+        chip.innerHTML = `${esc(tag)} <span style="cursor:pointer; opacity:0.6; margin-left:3px;" onclick="removeHashtag(${idx})">✕</span>`;
+        container.appendChild(chip);
+      });
+    }
+
+    function removeHashtag(idx) {
+      if (currentResult && currentResult.hashtags) {
+        currentResult.hashtags.splice(idx, 1);
+        renderHashtags(currentResult.hashtags);
+      }
+    }
+
+    function toggleVisualMode(mode) {
+      visualMode = mode;
+      updateVisualToggleUI();
+      const post = currentResult.posts[activePostIndex];
+      if (!post) return;
+      document.getElementById('activeMainImg').src = mode === 'final' ? post.final_url : post.background_url;
+    }
+
+    function updateVisualToggleUI() {
+      document.getElementById('vbtnFinal').classList.toggle('active', visualMode === 'final');
+      document.getElementById('vbtnBackground').classList.toggle('active', visualMode === 'bg');
+    }
+
+    async function applyQuickOverlay() {
+      const post = currentResult.posts[activePostIndex];
+      if (!post) return;
+      const newText = document.getElementById('quickOverlayInput').value;
+      const align = document.getElementById('quickAlignSelect').value;
+      const qLogoSelect = document.getElementById('quickLogoPosSelect');
+      const logoPos = qLogoSelect ? qLogoSelect.value : selectedLogoPosition;
+
+      try {
+        const res = await fetch('/api/overlay-preview', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            post_dir: post.dir || '',
+            background_data_url: post.background_data_url || post.background_url || '',
+            overlay_text: newText,
+            align: align,
+            logo_position: logoPos,
+            logo_scale: selectedLogoScale,
+            logo_opacity: parseFloat(selectedLogoOpacity)
+          })
+        });
+        if (!res.ok) throw new Error('Metin/Logo bindirme başarısız.');
+        const data = await res.json();
+        const updatedUrl = data.final_url || data.final_data_url;
+        post.final_url = updatedUrl;
+        post.final_data_url = data.final_data_url || updatedUrl;
+        if (visualMode === 'final') {
+          document.getElementById('activeMainImg').src = updatedUrl;
+        }
+        const activeCard = document.querySelectorAll('.var-thumb-card')[activePostIndex];
+        if (activeCard) {
+          activeCard.querySelector('img').src = updatedUrl;
+        }
+        showToast('Metin ve logo güncellendi!', '✓');
+      } catch (err) {
+        alert('HATA: ' + err.message);
+      }
+    }
+
+    async function saveActivePost() {
+      const post = currentResult.posts[activePostIndex];
+      if (!post) return;
+
+      const caption = document.getElementById('activeCaption').value;
+      const tags = currentResult.hashtags || [];
+      const overlay = document.getElementById('quickOverlayInput').value;
+      const align = document.getElementById('quickAlignSelect').value;
+
+      try {
+        const res = await fetch('/api/save-post', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            post_dir: post.dir,
+            caption: caption,
+            hashtags: tags,
+            overlay_text: overlay,
+            align: align
+          })
+        });
+        if (!res.ok) throw new Error('Kaydetme başarısız.');
+        showToast('Gönderi klasöre kaydedildi!', '💾');
+      } catch (err) {
+        alert('HATA: ' + err.message);
+      }
+    }
+
+    function copyCaptionAndTags() {
+      const caption = document.getElementById('activeCaption').value;
+      const tags = (currentResult && currentResult.hashtags) ? currentResult.hashtags.join(' ') : '';
+      const textToCopy = `${caption}\n\n${tags}`.trim();
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        showToast('Caption ve hashtag\'ler panoya kopyalandı!', '📋');
+      });
+    }
+
+    function downloadActiveImage() {
+      const post = currentResult.posts[activePostIndex];
+      if (!post) return;
+      const url = visualMode === 'final' ? (post.final_url || post.final_data_url) : (post.background_url || post.background_data_url);
+      const fmt = document.getElementById('inputFormat').value || 'post_4x5';
+
+      const fileNames = {
+        'post_4x5': `instagram-post-1080x1350-v${activePostIndex + 1}.jpg`,
+        'post_1x1': `instagram-post-1080x1080-v${activePostIndex + 1}.jpg`,
+        'story_9x16': `instagram-story-1080x1920-v${activePostIndex + 1}.jpg`,
+        'reels_cover_9x16': `instagram-reels-1080x1920-v${activePostIndex + 1}.jpg`
+      };
+      const filename = fileNames[fmt] || `instagram-post-${activePostIndex + 1}.jpg`;
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast(`Instagram formatında indirildi: ${filename}`, '⬇️');
+    }
+
+    let loadedHistoryItems = [];
+
+    async function loadHistory() {
+      const grid = document.getElementById('historyGrid');
+      grid.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem;">Yükleniyor...</div>';
+
+      // 1. Önce IndexedDB'deki tarayıcı hafızasını oku
+      const localItems = await StudioDB.getAll();
+      const badge = document.getElementById('historyCountBadge');
+      if (badge) {
+        badge.innerText = `${localItems.length} / 20 Tarayıcı Hafızası`;
+      }
+
+      // 2. Varsa sunucu çıktılarını da oku
+      let serverItems = [];
+      try {
+        const res = await fetch('/api/outputs');
+        if (res.ok) {
+          serverItems = await res.json();
+        }
+      } catch (err) {
+        // Vercel / salt-okunur modda sunucu outputs olmayabilir, sorun değil
+      }
+
+      const allItems = [];
+
+      // Local IndexedDB öğelerini ekle
+      localItems.forEach(item => {
+        allItems.push({
+          source: 'local',
+          id: item.id,
+          date: item.date || 'Bugün',
+          post_name: item.format_name || 'Instagram Gönderisi',
+          topic: item.topic || 'Instagram İçeriği',
+          caption: item.caption || '',
+          hashtags: item.hashtags || [],
+          final_url: item.final_url,
+          background_url: item.background_url || item.final_url,
+          format: item.format || 'post_4x5'
+        });
+      });
+
+      // Sunucu öğelerini ekle (eğer yerelde çalışıyorsa)
+      serverItems.forEach(item => {
+        allItems.push({
+          source: 'server',
+          id: null,
+          date: item.date,
+          post_name: item.post_name,
+          topic: item.topic,
+          caption: item.caption,
+          hashtags: item.hashtags || [],
+          final_url: item.final_url,
+          background_url: item.background_url || item.final_url,
+          format: item.format
+        });
+      });
+
+      loadedHistoryItems = allItems;
+
+      if (!allItems.length) {
+        grid.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem;">Henüz kayıtlı veya üretilmiş içerik bulunmuyor.</div>';
+        return;
+      }
+
+      const fmtNames = {
+        'post_4x5': 'instagram-post-1080x1350.jpg',
+        'post_1x1': 'instagram-post-1080x1080.jpg',
+        'story_9x16': 'instagram-story-1080x1920.jpg',
+        'reels_cover_9x16': 'instagram-reels-1080x1920.jpg'
+      };
+
+      grid.innerHTML = '';
+      allItems.forEach((item, idx) => {
+        const downloadName = `${item.date}-${fmtNames[item.format] || 'instagram-post.jpg'}`;
+        const isLocal = item.source === 'local';
+        const card = document.createElement('div');
+        card.className = 'history-item-card';
+        card.innerHTML = `
+          <div class="history-img-box">
+            <img src="${item.final_url}" alt="${esc(item.topic)}" loading="lazy">
+          </div>
+          <div class="history-info-box">
+            <div style="font-size:0.72rem; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center;">
+              <span>📅 ${esc(item.date)}</span>
+              <span class="meta-tag-pill" style="font-size:0.6rem; padding:1px 6px;">${isLocal ? '💾 Tarayıcı Hafızası' : '📁 Sunucu'}</span>
+            </div>
+            <div style="font-size:0.9rem; font-weight:800; color:var(--text-main);">${esc(item.topic)}</div>
+            <div style="font-size:0.75rem; color:var(--text-muted); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${esc(item.caption)}</div>
+            <div style="margin-top:auto; padding-top:0.6rem; display:flex; gap:0.4rem;">
+              <a href="${item.final_url}" download="${downloadName}" class="btn-action-primary-mono" style="flex:1; text-decoration:none; text-align:center; padding:0.5rem; font-size:0.75rem;">
+                ⬇️ İndir
+              </a>
+              <button type="button" class="btn-action-secondary-mono" style="flex:1; padding:0.5rem; font-size:0.75rem;" onclick="restorePostToStudio(${idx})">
+                📱 Stüdyoda Aç
+              </button>
+              ${isLocal ? `<button type="button" class="btn-action-secondary-mono" style="padding:0.5rem 8px; font-size:0.75rem;" onclick="deleteLocalPost(${item.id})" title="Sil">🗑️</button>` : ''}
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function restorePostToStudio(idx) {
+      const item = loadedHistoryItems[idx];
+      if (!item) return;
+
+      currentResult = {
+        success: true,
+        posts: [{
+          final_url: item.final_url,
+          background_url: item.background_url || item.final_url,
+          final_data_url: item.final_url.startsWith('data:') ? item.final_url : '',
+          background_data_url: (item.background_url && item.background_url.startsWith('data:')) ? item.background_url : '',
+          meta: {
+            format: item.format,
+            payload: { topic: item.topic, overlay_text: '' }
+          }
+        }],
+        caption: item.caption,
+        hashtags: item.hashtags || [],
+        cost: { total_usd: 0 },
+        mock: true
+      };
+      activePostIndex = 0;
+
+      const fmtCard = document.getElementById('fmt-' + item.format);
+      if (fmtCard) {
+        selectFormat(item.format, fmtCard);
+      }
+
+      renderResults();
+      switchTab('studio');
+      showToast('Gönderi stüdyo simülatöründe açıldı!', '📱');
+    }
+
+    async function deleteLocalPost(id) {
+      await StudioDB.deletePost(id);
+      showToast('Kayıt silindi.', '🗑️');
+      loadHistory();
+    }
+
+    async function clearLocalHistory() {
+      if (confirm('Tarayıcı hafızasındaki son üretimleri silmek istediğinizden emin misiniz?')) {
+        await StudioDB.clearAll();
+        showToast('Tarayıcı hafızası temizlendi.', '🗑️');
+        loadHistory();
+      }
+    }
+
+    function showToast(msg, icon = '●') {
+      const toast = document.getElementById('toastBar');
+      document.getElementById('toastText').innerText = msg;
+      document.getElementById('toastIcon').innerText = icon;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3200);
+    }
+  </script>
+</body>
+</html>

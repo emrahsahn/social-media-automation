@@ -113,10 +113,100 @@ def overlay_text(img: Image.Image, text: str, brand: dict | None = None) -> Imag
     block_bottom = height - round(height * text_cfg["bottom_margin_ratio"])
     y = block_bottom - block_h
     fill = tuple(text_cfg["color"])
+    align = text_cfg.get("align", "center")
+    side_pad = round(width * text_cfg["side_padding_ratio"])
     for line in lines:
         line_w = drawer.textlength(line, font=font)
-        x = (width - line_w) / 2
+        if align == "left":
+            x = float(side_pad)
+        elif align == "right":
+            x = float(width - side_pad - line_w)
+        else:  # center
+            x = (width - line_w) / 2
         drawer.text((x, y), line, font=font, fill=fill)
         y += line_h
 
     return Image.alpha_composite(base, layer).convert("RGB")
+
+
+def overlay_logo(
+    img: Image.Image,
+    logo: Image.Image,
+    position: str = "top-right",
+    scale: float = 0.16,
+    opacity: float = 1.0,
+    margin_ratio: float = 0.04,
+) -> Image.Image:
+    """`img` üzerine `logo` görselini belirtilen konum ve boyutta şeffaf olarak bindirir.
+
+    Parametreler:
+        img: Ana görsel (RGB veya RGBA)
+        logo: Firma logosu (PNG, şeffaflık desteklenir)
+        position: 'top-left', 'top-right', 'bottom-left', 'bottom-right', 'top-center', 'center', 'bottom-center'
+        scale: Logonun ana görsel genişliğine oranı (varsayılan 0.16 = %16)
+        opacity: 0.0 - 1.0 arası saydamlık
+        margin_ratio: Kenarlardan bırakılacak güvenli boşluk oranı
+    """
+    if logo is None:
+        return img.convert("RGB").copy()
+
+    width, height = img.size
+    base = img.convert("RGBA")
+
+    # 1. Logo boyutlandırma (en-boy oranını koruyarak)
+    max_logo_w = max(round(width * scale), 30)
+    logo_rgba = logo.convert("RGBA")
+    orig_w, orig_h = logo_rgba.size
+    if orig_w == 0 or orig_h == 0:
+        return img.convert("RGB").copy()
+
+    aspect = orig_h / orig_w
+    target_w = max_logo_w
+    target_h = max(round(target_w * aspect), 20)
+
+    # Çok yüksek veya dikey logolarda boyu sınırla (en fazla görselin %18'i)
+    max_logo_h = round(height * 0.18)
+    if target_h > max_logo_h:
+        target_h = max_logo_h
+        target_w = max(round(target_h / aspect), 20)
+
+    resample_filter = getattr(Image, "Resampling", Image).LANCZOS
+    logo_resized = logo_rgba.resize((target_w, target_h), resample=resample_filter)
+
+    # 2. Saydamlık uygulama
+    if opacity < 1.0:
+        r, g, b, a = logo_resized.split()
+        a = a.point(lambda p: int(p * max(0.0, min(opacity, 1.0))))
+        logo_resized = Image.merge("RGBA", (r, g, b, a))
+
+    # 3. Konum koordinatları hesaplama
+    margin = round(width * margin_ratio)
+    pos = (position or "top-right").lower().strip()
+
+    if pos in ("top-left", "sol-ust"):
+        x = margin
+        y = margin
+    elif pos in ("top-center", "ust-orta"):
+        x = round((width - target_w) / 2)
+        y = margin
+    elif pos in ("bottom-left", "sol-alt"):
+        x = margin
+        y = height - target_h - margin
+    elif pos in ("bottom-right", "sag-alt"):
+        x = width - target_w - margin
+        y = height - target_h - margin
+    elif pos in ("bottom-center", "alt-orta"):
+        x = round((width - target_w) / 2)
+        y = height - target_h - margin
+    elif pos in ("center", "orta"):
+        x = round((width - target_w) / 2)
+        y = round((height - target_h) / 2)
+    else:  # "top-right" / "sag-ust" (varsayılan)
+        x = width - target_w - margin
+        y = margin
+
+    layer = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    layer.paste(logo_resized, (x, y), mask=logo_resized)
+
+    return Image.alpha_composite(base, layer).convert("RGB")
+

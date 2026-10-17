@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SocialCraft — İnteraktif Tema & Renk Paleti Seçici</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* TEMEL DEĞİŞKENLER VE TEMA PALETLERİ */
+    
+    /* 1. TEMA: COSMIC INDIGO (Modern SaaS / Vercel-Linear) */
+    [data-palette="indigo"][data-theme="dark"] {
+      --bg-base: #0B0F17;
+      --bg-surface: #121826;
+      --bg-surface-elevated: #182234;
+      --bg-glass: rgba(18, 24, 38, 0.75);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.16);
+      --primary: #6366F1;
+      --primary-hover: #4F46E5;
+      --primary-glow: rgba(99, 102, 241, 0.35);
+      --accent-secondary: #06B6D4;
+      --text-main: #F9FAFB;
+      --text-muted: #9CA3AF;
+      --text-dim: #6B7280;
+      --shadow-glass: 0 12px 36px 0 rgba(0, 0, 0, 0.5);
+      --badge-bg: rgba(99, 102, 241, 0.15);
+      --badge-text: #A5B4FC;
+    }
+    [data-palette="indigo"][data-theme="light"] {
+      --bg-base: #F8FAFC;
+      --bg-surface: #FFFFFF;
+      --bg-surface-elevated: #F1F5F9;
+      --bg-glass: rgba(255, 255, 255, 0.85);
+      --border-subtle: #E2E8F0;
+      --border-strong: #CBD5E1;
+      --primary: #4F46E5;
+      --primary-hover: #4338CA;
+      --primary-glow: rgba(79, 70, 229, 0.2);
+      --accent-secondary: #0284C7;
+      --text-main: #0F172A;
+      --text-muted: #475569;
+      --text-dim: #94A3B8;
+      --shadow-glass: 0 10px 30px -5px rgba(0, 0, 0, 0.07);
+      --badge-bg: #EEF2FF;
+      --badge-text: #4F46E5;
+    }
+
+    /* 2. TEMA: CYBER EMERALD (Teknolojik, Temiz & Enerjik) */
+    [data-palette="emerald"][data-theme="dark"] {
+      --bg-base: #060D0B;
+      --bg-surface: #0E1815;
+      --bg-surface-elevated: #152420;
+      --bg-glass: rgba(14, 24, 21, 0.8);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(16, 185, 129, 0.25);
+      --primary: #10B981;
+      --primary-hover: #059669;
+      --primary-glow: rgba(16, 185, 129, 0.35);
+      --accent-secondary: #14B8A6;
+      --text-main: #F0FDF4;
+      --text-muted: #86EFAC;
+      --text-dim: #4ADE80;
+      --shadow-glass: 0 12px 36px 0 rgba(0, 0, 0, 0.6);
+      --badge-bg: rgba(16, 185, 129, 0.15);
+      --badge-text: #6EE7B7;
+    }
+    [data-palette="emerald"][data-theme="light"] {
+      --bg-base: #F5FAF7;
+      --bg-surface: #FFFFFF;
+      --bg-surface-elevated: #EAF4EE;
+      --bg-glass: rgba(255, 255, 255, 0.88);
+      --border-subtle: #D1E7DD;
+      --border-strong: #A3D4C0;
+      --primary: #059669;
+      --primary-hover: #047857;
+      --primary-glow: rgba(5, 150, 105, 0.2);
+      --accent-secondary: #0D9488;
+      --text-main: #064E3B;
+      --text-muted: #166534;
+      --text-dim: #4B6F58;
+      --shadow-glass: 0 10px 30px -5px rgba(5, 150, 105, 0.08);
+      --badge-bg: #ECFDF5;
+      --badge-text: #059669;
+    }
+
+    /* 3. TEMA: OBSIDIAN AMBER (Sıcak, Lüks & Editorial) */
+    [data-palette="amber"][data-theme="dark"] {
+      --bg-base: #110E0B;
+      --bg-surface: #1C1712;
+      --bg-surface-elevated: #28211A;
+      --bg-glass: rgba(28, 23, 18, 0.8);
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --border-strong: rgba(245, 158, 11, 0.25);
+      --primary: #F59E0B;
+      --primary-hover: #D97706;
+      --primary-glow: rgba(245, 158, 11, 0.35);
+      --accent-secondary: #FB923C;
+      --text-main: #FFFBEB;
+      --text-muted: #D97706;
+      --text-dim: #92400E;
+      --shadow-glass: 0 12px 36px 0 rgba(0, 0, 0, 0.6);
+      --badge-bg: rgba(245, 158, 11, 0.15);
+      --badge-text: #FCD34D;
+    }
+    [data-palette="amber"][data-theme="light"] {
+      --bg-base: #FAF7F2;
+      --bg-surface: #FFFFFF;
+      --bg-surface-elevated: #F3ECE2;
+      --bg-glass: rgba(255, 255, 255, 0.9);
+      --border-subtle: #E8DCCF;
+      --border-strong: #D6C2AC;
+      --primary: #D97706;
+      --primary-hover: #B45309;
+      --primary-glow: rgba(217, 119, 6, 0.2);
+      --accent-secondary: #EA580C;
+      --text-main: #451A03;
+      --text-muted: #78350F;
+      --text-dim: #9A6B48;
+      --shadow-glass: 0 10px 30px -5px rgba(217, 119, 6, 0.08);
+      --badge-bg: #FEF3C7;
+      --badge-text: #B45309;
+    }
+
+    /* 4. TEMA: TITANIUM SLATE (Zarif, Apple & Kurumsal Minimal) */
+    [data-palette="slate"][data-theme="dark"] {
+      --bg-base: #0E1116;
+      --bg-surface: #161B22;
+      --bg-surface-elevated: #21262D;
+      --bg-glass: rgba(22, 27, 34, 0.8);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.18);
+      --primary: #38BDF8;
+      --primary-hover: #0284C7;
+      --primary-glow: rgba(56, 189, 248, 0.35);
+      --accent-secondary: #818CF8;
+      --text-main: #F0F6FC;
+      --text-muted: #8B949E;
+      --text-dim: #484F58;
+      --shadow-glass: 0 12px 36px 0 rgba(0, 0, 0, 0.6);
+      --badge-bg: rgba(56, 189, 248, 0.15);
+      --badge-text: #7DD3FC;
+    }
+    [data-palette="slate"][data-theme="light"] {
+      --bg-base: #F6F8FA;
+      --bg-surface: #FFFFFF;
+      --bg-surface-elevated: #EAEEF2;
+      --bg-glass: rgba(255, 255, 255, 0.9);
+      --border-subtle: #D0D7DE;
+      --border-strong: #AFB8C1;
+      --primary: #0969DA;
+      --primary-hover: #0550AE;
+      --primary-glow: rgba(9, 105, 218, 0.2);
+      --accent-secondary: #6366F1;
+      --text-main: #1F2328;
+      --text-muted: #656D76;
+      --text-dim: #8C959F;
+      --shadow-glass: 0 10px 30px -5px rgba(0, 0, 0, 0.06);
+      --badge-bg: #DDF4FF;
+      --badge-text: #0969DA;
+    }
+
+    /* 5. TEMA: MONOCHROME ONYX (Saf Siyah & Beyaz / Minimalist Lüks) */
+    [data-palette="mono"][data-theme="dark"] {
+      --bg-base: #09090B;
+      --bg-surface: #121215;
+      --bg-surface-elevated: #18181B;
+      --bg-glass: rgba(18, 18, 21, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.12);
+      --border-strong: rgba(255, 255, 255, 0.28);
+      --primary: #FFFFFF;
+      --primary-hover: #E4E4E7;
+      --primary-contrast: #09090B;
+      --primary-glow: rgba(255, 255, 255, 0.25);
+      --accent-secondary: #A1A1AA;
+      --text-main: #FAFAFA;
+      --text-muted: #A1A1AA;
+      --text-dim: #71717A;
+      --shadow-glass: 0 14px 44px 0 rgba(0, 0, 0, 0.8);
+      --badge-bg: rgba(255, 255, 255, 0.12);
+      --badge-text: #FAFAFA;
+    }
+    [data-palette="mono"][data-theme="light"] {
+      --bg-base: #FAFAFA;
+      --bg-surface: #FFFFFF;
+      --bg-surface-elevated: #F4F4F5;
+      --bg-glass: rgba(255, 255, 255, 0.95);
+      --border-subtle: #E4E4E7;
+      --border-strong: #D4D4D8;
+      --primary: #09090B;
+      --primary-hover: #27272A;
+      --primary-contrast: #FFFFFF;
+      --primary-glow: rgba(0, 0, 0, 0.15);
+      --accent-secondary: #52525B;
+      --text-main: #09090B;
+      --text-muted: #52525B;
+      --text-dim: #A1A1AA;
+      --shadow-glass: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+      --badge-bg: #E4E4E7;
+      --badge-text: #09090B;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease, box-shadow 0.25s ease;
+    }
+
+    body {
+      background: var(--bg-base);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ÜST KONTROL ÇUBUĞU (THEME CONTROLLER BAR) */
+    .top-controller-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-glass);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0.85rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+    .controller-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .palette-selector-pills {
+      display: flex;
+      align-items: center;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 4px;
+    }
+
+    .palette-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .palette-btn.active {
+      background: var(--primary);
+      color: var(--primary-contrast, #fff);
+      box-shadow: 0 2px 8px var(--primary-glow);
+    }
+
+    .color-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.4);
+    }
+
+    /* LIGHT / DARK TOGGLE SWITCH */
+    .mode-switch-wrap {
+      display: flex;
+      align-items: center;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      padding: 3px;
+    }
+
+    .mode-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.825rem;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mode-btn.active {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* ANA İÇERİK: CANLI STÜDYO ÖNİZLEMESİ */
+    main {
+      flex: 1;
+      padding: 2rem;
+      max-width: 1540px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .hero-banner {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .hero-banner h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+    }
+
+    .hero-banner p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* GERÇEK UYGULAMA MOCKUP GRID */
+    .mockup-grid {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    @media (max-width: 1040px) {
+      .mockup-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Kart Yapısı */
+    .glass-card {
+      background: var(--bg-glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow-glass);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    .card-header h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.825rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 0.4rem;
+    }
+
+    .input-text, .select-input {
+      width: 100%;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 0.7rem 0.9rem;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.875rem;
+      outline: none;
+    }
+
+    .input-text:focus, .select-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    /* Format Seçici Butonlar */
+    .format-btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+
+    .fmt-card {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+    }
+
+    .fmt-card.active {
+      border-color: var(--primary);
+      background: var(--badge-bg);
+      box-shadow: 0 0 0 1px var(--primary);
+    }
+
+    .fmt-icon {
+      width: 28px;
+      height: 35px;
+      border: 1.5px dashed var(--text-dim);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .fmt-card.active .fmt-icon {
+      border-color: var(--primary);
+      color: var(--primary);
+      border-style: solid;
+    }
+
+    /* Büyük Aksiyon Butonu */
+    .btn-action-primary {
+      width: 100%;
+      padding: 1rem;
+      background: var(--primary);
+      border: none;
+      border-radius: 12px;
+      color: var(--primary-contrast, #fff);
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      box-shadow: 0 4px 20px var(--primary-glow);
+      margin-top: 1.5rem;
+    }
+
+    .btn-action-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+
+    /* SAĞ VİTRİN: GÖRSEL VE METİN ALANI */
+    .preview-showcase {
+      display: grid;
+      grid-template-columns: 460px 1fr;
+      gap: 1.5rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow-glass);
+    }
+
+    @media (max-width: 1300px) {
+      .preview-showcase { grid-template-columns: 1fr; }
+    }
+
+    /* Görsel Simülasyonu */
+    .visual-frame {
+      width: 100%;
+      height: 480px;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      background: linear-gradient(135deg, #2D3748, #1A202C);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .visual-bg-mock {
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 70% 30%, rgba(99, 102, 241, 0.4) 0%, transparent 60%),
+        radial-gradient(circle at 30% 70%, rgba(6, 182, 212, 0.3) 0%, transparent 60%),
+        linear-gradient(180deg, #1E293B, #0F172A);
+      z-index: 1;
+    }
+
+    .visual-overlay-strip {
+      position: relative;
+      z-index: 2;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 65%, transparent 100%);
+      padding: 2.5rem 1.5rem 1.75rem;
+      text-align: center;
+    }
+
+    .visual-overlay-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+      line-height: 1.3;
+    }
+
+    /* Sağ Detaylar */
+    .details-pane {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .badge-pill {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      display: inline-block;
+    }
+
+    .caption-box-mock {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 0.85rem;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      color: var(--text-main);
+    }
+
+    .hashtag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .hashtag-tag {
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* CSS ÇIKTI MODALI / KOPYALAYICI */
+    .export-section {
+      margin-top: 2.5rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 1.5rem;
+    }
+
+    .export-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .export-code {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1rem;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .btn-apply-direct {
+      background: var(--primary);
+      border: none;
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body data-palette="mono" data-theme="dark">
+
+  <!-- ÜST İNTERAKTİF TEMA YÖNETİM ÇUBUĞU -->
+  <div class="top-controller-bar">
+    <div class="controller-title">
+      <span>🎨 SocialCraft Tema Seçici</span>
+    </div>
+
+    <!-- 5 TEMA PALETİ SEÇİCİSİ -->
+    <div class="palette-selector-pills">
+      <button type="button" class="palette-btn active" onclick="setPalette('mono', this)">
+        <span class="color-dot" style="background:#FFFFFF; border:1px solid #71717A;"></span>
+        <span>🖤 Monochrome (Siyah-Beyaz)</span>
+      </button>
+      <button type="button" class="palette-btn" onclick="setPalette('indigo', this)">
+        <span class="color-dot" style="background:#6366F1;"></span>
+        <span>Cosmic Indigo (SaaS)</span>
+      </button>
+      <button type="button" class="palette-btn" onclick="setPalette('emerald', this)">
+        <span class="color-dot" style="background:#10B981;"></span>
+        <span>Cyber Emerald (Yeşil)</span>
+      </button>
+      <button type="button" class="palette-btn" onclick="setPalette('amber', this)">
+        <span class="color-dot" style="background:#F59E0B;"></span>
+        <span>Obsidian Amber (Sıcak)</span>
+      </button>
+      <button type="button" class="palette-btn" onclick="setPalette('slate', this)">
+        <span class="color-dot" style="background:#38BDF8;"></span>
+        <span>Titanium Slate (Minimal)</span>
+      </button>
+    </div>
+
+    <!-- LIGHT / DARK MOD SWITCH -->
+    <div class="mode-switch-wrap">
+      <button type="button" class="mode-btn active" id="btnModeDark" onclick="setThemeMode('dark')">
+        🌙 Karanlık
+      </button>
+      <button type="button" class="mode-btn" id="btnModeLight" onclick="setThemeMode('light')">
+        ☀️ Aydınlık
+      </button>
+    </div>
+  </div>
+
+  <!-- ANA GÖRÜNÜM -->
+  <main>
+    <div class="hero-banner">
+      <h1>Canlı Arayüz Önizleme & Tema Stüdyosu</h1>
+      <p>Yukarıdaki butonlarla temaları ve <strong>Aydınlık / Karanlık</strong> modları değiştirin. Gerçek arayüz bileşenlerinin seçtiğiniz renkte nasıl göründüğünü anında canlı deneyimleyin!</p>
+    </div>
+
+    <!-- CANLI MOCKUP -->
+    <div class="mockup-grid">
+      
+      <!-- Sol Panel: Form Mockup -->
+      <div class="glass-card">
+        <div class="card-header">
+          <h3>İçerik Parametreleri</h3>
+          <span class="badge-pill">Örnek Form</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <span>Tema / Konu</span>
+            <span style="color:var(--text-dim); font-size:0.75rem;">Zorunlu</span>
+          </label>
+          <input type="text" class="input-text" value="Yeni Sezon Dağ Çilekli Soğuk Kahve">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Hedef Format</label>
+          <div class="format-btn-grid">
+            <div class="fmt-card active">
+              <div class="fmt-icon">4:5</div>
+              <div>
+                <div style="font-size:0.8rem; font-weight:700;">Post (Dikey)</div>
+                <div style="font-size:0.7rem; color:var(--text-muted);">1080 × 1350</div>
+              </div>
+            </div>
+            <div class="fmt-card">
+              <div class="fmt-icon">1:1</div>
+              <div>
+                <div style="font-size:0.8rem; font-weight:700;">Post (Kare)</div>
+                <div style="font-size:0.7rem; color:var(--text-muted);">1080 × 1080</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Görsel Üzerindeki Metin</label>
+          <input type="text" class="input-text" value="Doğal Dağ Çileği Aroması">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Görsel Stili</label>
+          <select class="select-input">
+            <option>☕ Yaşam Tarzı (Lifestyle)</option>
+            <option>📸 Ürün Fotoğrafı (Product Photo)</option>
+          </select>
+        </div>
+
+        <button type="button" class="btn-action-primary">
+          ✨ İçerik Paketini Üret
+        </button>
+      </div>
+
+      <!-- Sağ Panel: Önizleme & Görsel Mockup -->
+      <div class="preview-showcase">
+        
+        <!-- Tuval -->
+        <div class="visual-frame">
+          <div class="visual-bg-mock"></div>
+          <div class="visual-overlay-strip">
+            <div class="visual-overlay-text">
+              Doğal Dağ Çileği Aroması
+            </div>
+          </div>
+        </div>
+
+        <!-- Detaylar -->
+        <div class="details-pane">
+          <div>
+            <span class="badge-pill">Varyasyon #1 (Final)</span>
+            <span class="badge-pill" style="margin-left:0.3rem;">Maliyet: $0.042</span>
+          </div>
+
+          <div>
+            <div style="font-size:0.8rem; font-weight:700; margin-bottom:0.4rem;">Türkçe Caption</div>
+            <div class="caption-box-mock">
+              Yazın ferahlığını fincanınıza taşıyan yeni lezzet: Dağ çileği aromalı soğuk kahvemiz şimdi şubelerimizde! Sınırlı süreyle özel indirimle deneyin.
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:0.8rem; font-weight:700; margin-bottom:0.4rem;">Hashtag'ler</div>
+            <div class="hashtag-row">
+              <span class="hashtag-tag">#sogukkahve</span>
+              <span class="hashtag-tag">#dagcilegi</span>
+              <span class="hashtag-tag">#kahvekeyfi</span>
+              <span class="hashtag-tag">#yazlezzetleri</span>
+            </div>
+          </div>
+
+          <div style="margin-top:auto; display:flex; gap:0.5rem;">
+            <button type="button" class="btn-action-primary" style="margin-top:0; flex:1;">
+              💾 Gönderiyi Kaydet
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- CSS DEĞİŞKENLERİ KOD ALANI -->
+    <div class="export-section">
+      <div class="export-header">
+        <div>
+          <h3 style="font-family:'Outfit',sans-serif; font-size:1.1rem; font-weight:700;">Seçilen Temanın CSS Token Kodları</h3>
+          <p style="font-size:0.8rem; color:var(--text-muted);">Bu kodlar doğrudan SocialCraft Studio arayüzüne uygulanacak değişkenlerdir.</p>
+        </div>
+        <button type="button" class="btn-apply-direct" onclick="copyCssVars()">
+          📋 CSS Kodunu Kopyala
+        </button>
+      </div>
+      <div class="export-code" id="cssOutputBox"></div>
+    </div>
+  </main>
+
+  <script>
+    let currentPalette = 'mono';
+    let currentTheme = 'dark';
+
+    function setPalette(pal, el) {
+      currentPalette = pal;
+      document.body.setAttribute('data-palette', pal);
+      document.querySelectorAll('.palette-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      updateCodeOutput();
+    }
+
+    function setThemeMode(mode) {
+      currentTheme = mode;
+      document.body.setAttribute('data-theme', mode);
+      document.getElementById('btnModeDark').classList.toggle('active', mode === 'dark');
+      document.getElementById('btnModeLight').classList.toggle('active', mode === 'light');
+      updateCodeOutput();
+    }
+
+    function updateCodeOutput() {
+      const computed = getComputedStyle(document.body);
+      const code = `/* ${currentPalette.toUpperCase()} - ${currentTheme.toUpperCase()} TEMA TOKENS */
+[data-theme="${currentTheme}"] {
+  --bg-base: ${computed.getPropertyValue('--bg-base').trim()};
+  --bg-surface: ${computed.getPropertyValue('--bg-surface').trim()};
+  --bg-surface-elevated: ${computed.getPropertyValue('--bg-surface-elevated').trim()};
+  --primary: ${computed.getPropertyValue('--primary').trim()};
+  --primary-hover: ${computed.getPropertyValue('--primary-hover').trim()};
+  --text-main: ${computed.getPropertyValue('--text-main').trim()};
+  --text-muted: ${computed.getPropertyValue('--text-muted').trim()};
+  --border-subtle: ${computed.getPropertyValue('--border-subtle').trim()};
+}`;
+      document.getElementById('cssOutputBox').innerText = code;
+    }
+
+    function copyCssVars() {
+      const code = document.getElementById('cssOutputBox').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        alert('CSS tema kodları panoya kopyalandı!');
+      });
+    }
+
+    // İlk açılışta kodu doldur
+    window.addEventListener('DOMContentLoaded', () => {
+      updateCodeOutput();
+    });
+  </script>
+</body>
+</html>

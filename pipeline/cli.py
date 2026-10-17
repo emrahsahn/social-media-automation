@@ -11,6 +11,14 @@ from __future__ import annotations
 import argparse
 import sys
 
+if sys.platform == "win32":
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8")
+
+from openai import APIError
+
 from pipeline.config import MissingApiKeyError
 from pipeline.formats import FORMATS, QUALITIES, STYLES
 from pipeline.generate import run_pipeline
@@ -27,7 +35,24 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--format", default="post_4x5", choices=list(FORMATS), help="Hedef format")
     parser.add_argument("--overlay-text", default="", help="Görsel üzerine yazılacak metin (opsiyonel)")
     parser.add_argument("--notes", default="", help="Ek notlar (renk, ton vb.)")
-    parser.add_argument("--quality", default="medium", choices=QUALITIES, help="gpt-image-1 kalitesi")
+    parser.add_argument(
+        "--provider",
+        default="openai",
+        choices=("openai", "anthropic"),
+        help="LLM / Vision sağlayıcısı (varsayılan: openai)",
+    )
+    parser.add_argument(
+        "--reference-image",
+        default=None,
+        help="Referans görsel yolu (JPG/PNG/WebP, maks. 10 MB)",
+    )
+    parser.add_argument(
+        "--reference-mode",
+        default="b1",
+        choices=("b1", "b2"),
+        help="b1: stil çözümleme, prompt'a yansıt (varsayılan) | b2: doğrudan edit API",
+    )
+    parser.add_argument("--quality", default="standard", choices=QUALITIES, help="Görsel kalitesi (DALL-E 3: standard, hd)")
     parser.add_argument("--mock", action="store_true", help="API yerine sahte üretimle test")
     parser.add_argument("--out-root", default=None, help="Çıktı kök klasörü (varsayılan: ./outputs)")
     return parser
@@ -39,7 +64,9 @@ def main(argv: list[str] | None = None) -> int:
         "topic": args.topic,
         "image_count": args.count,
         "style": args.style,
-        "reference_image": None,
+        "provider": args.provider,
+        "reference_image": args.reference_image,
+        "reference_mode": args.reference_mode,
         "format": args.format,
         "overlay_text": args.overlay_text or None,
         "notes": args.notes or None,
@@ -53,6 +80,9 @@ def main(argv: list[str] | None = None) -> int:
     except (ValueError, FileNotFoundError, RuntimeError) as exc:
         print(f"HATA: {exc}", file=sys.stderr)
         return 1
+    except APIError as exc:
+        print(f"HATA (API): {type(exc).__name__}: {exc}", file=sys.stderr)
+        return 3
 
     mode = "MOCK" if result["mock"] else "API"
     print(f"[{mode}] {len(result['posts'])} gönderi üretildi:")

@@ -1,11 +1,19 @@
 # Gizli bilgiler — asla commit'lenmesin
 .env
+.env.*
+!.env.example
+
+# Vercel CLI yerel ayarları (proje kimliği içerir)
+.vercel/
 
 # Python
 __pycache__/
 *.py[cod]
 .venv/
 venv/
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Üretilen içerik (görsel, caption, meta.json)
 outputs/
@@ -14,6 +22,7 @@ outputs/
 node_modules/
 .next/
 
-# İşletim sistemi
+# İşletim sistemi ve geçici dosyalar
 .DS_Store
 Thumbs.db
+*.log

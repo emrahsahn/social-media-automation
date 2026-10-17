@@ -78,5 +78,99 @@ def has_api_key(provider: str) -> bool:
     return True
 
 
+import hashlib
+import hmac
+import time
+
+_SESSION_SALT = "sosyal-medya-otomasyon-secure-salt-2026"
+
+
+def _is_vercel() -> bool:
+    return bool(os.environ.get("VERCEL") or os.environ.get("VERCEL_ENV"))
+
+
+def get_session_secret() -> str:
+    """Oturum token'larını imzalayan anahtarı döner.
+
+    Üretimde (Vercel) SESSION_SECRET ortam değişkeni ZORUNLUDUR; tanımsızsa
+    güvenli hata fırlatılır — böylece repoda herkese açık olan fallback
+    sabitle token imzalanamaz. Yerel geliştirmede fallback kullanılır.
+    """
+    secret = os.environ.get("SESSION_SECRET", "").strip()
+    if secret:
+        return secret
+    if _is_vercel():
+        raise RuntimeError(
+            "SESSION_SECRET tanımlı değil. Vercel panelinde Environment Variables "
+            "bölümüne rastgele bir anahtar ekleyin. Üretim komutu: "
+            'python -c "import secrets; print(secrets.token_hex(32))"'
+        )
+    return _SESSION_SALT
+
+
+def get_app_password() -> str:
+    """Ortam değişkeninden veya .env'den tanımlı uygulama şifresini döner.
+    Vercel/üretim ortamında APP_PASSWORD zorunludur.
+    Yerel ortamda tanımlı değilse varsayılan olarak 'admin' döner.
+    """
+    if "APP_PASSWORD" in os.environ:
+        return os.environ["APP_PASSWORD"].strip()
+    # Vercel ortamında şifresiz/admin varsayılanı ile açılmayı engelle
+    if _is_vercel():
+        return ""
+    return "admin"
+
+
+def is_auth_required() -> bool:
+    """Uygulama şifresi kontrolü gerekliliği."""
+    # Vercel'de şifre boşsa bile güvenlik gereği auth_required true sayılır
+    if _is_vercel():
+        return True
+    return bool(get_app_password())
+
+
+def create_session_token(expires_in_seconds: int = 86400 * 7) -> str:
+    """Geçerli şifre için süreli ve imzalı oturum belirteci üretir (varsayılan 7 gün)."""
+    pwd = get_app_password()
+    secret = get_session_secret()
+    exp = int(time.time()) + expires_in_seconds
+    payload = f"{pwd}:{exp}"
+    sig = hmac.new(secret.encode("utf-8"), payload.encode("utf-8"), hashlib.sha256).hexdigest()
+    return f"{exp}.{sig}"
+
+
+def verify_app_password(password: str) -> bool:
+    """Verilen şifre APP_PASSWORD ile eşleşiyor mu?"""
+    expected = get_app_password()
+    if not expected:
+        return False if _is_vercel() else True
+    return hmac.compare_digest(password.strip(), expected)
+
+
+def verify_session_token(token: str) -> bool:
+    """Gelen oturum belirteci geçerli mi ve süresi dolmamış mı?"""
+    if not is_auth_required():
+        return True
+    if not token:
+        return False
+    pwd = get_app_password()
+    if not pwd and _is_vercel():
+        return False
+    secret = get_session_secret()
+
+    # Yalnızca süreli format kabul edilir: "exp.sig"
+    if "." not in token:
+        return False
+    parts = token.split(".", 1)
+    if len(parts) != 2 or not parts[0].isdigit():
+        return False
+    exp = int(parts[0])
+    if time.time() > exp:
+        return False  # Süresi dolmuş oturum
+    payload = f"{pwd}:{exp}"
+    expected_sig = hmac.new(secret.encode("utf-8"), payload.encode("utf-8"), hashlib.sha256).hexdigest()
+    return hmac.compare_digest(parts[1], expected_sig)
+
+
 # Modül import edildiğinde .env'i bir kez yükle (dosya yoksa sessizce geçer).
 load_env()

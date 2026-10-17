@@ -1,0 +1,19 @@
+# Vercel deployment ignore file
+# Gereksiz dosyaların Vercel serverless paketine girmesini engeller
+
+.git
+.github
+.venv
+outputs
+.pytest_cache
+tests
+theme_showcase.html
+run_web.bat
+run_web.ps1
+.env
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.coverage
+htmlcov

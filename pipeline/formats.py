@@ -19,16 +19,16 @@ class FormatSpec(NamedTuple):
 
 FORMATS: dict[str, FormatSpec] = {
     "post_1x1": FormatSpec("post_1x1", (1080, 1080), "1024x1024", "1:1"),
-    "post_4x5": FormatSpec("post_4x5", (1080, 1350), "1024x1536", "4:5"),
-    "story_9x16": FormatSpec("story_9x16", (1080, 1920), "1024x1536", "9:16"),
-    "reels_cover_9x16": FormatSpec("reels_cover_9x16", (1080, 1920), "1024x1536", "9:16"),
+    "post_4x5": FormatSpec("post_4x5", (1080, 1350), "1024x1792", "4:5"),
+    "story_9x16": FormatSpec("story_9x16", (1080, 1920), "1024x1792", "9:16"),
+    "reels_cover_9x16": FormatSpec("reels_cover_9x16", (1080, 1920), "1024x1792", "9:16"),
 }
 
 # Form dropdown değerleri (bkz. plan: Kullanıcı Girdi Formu)
 STYLES = ("product_photo", "lifestyle", "illustration", "minimal_flat")
 
-# gpt-image-1 kalite kademeleri; maliyeti doğrudan etkiler (bkz. costs.py)
-QUALITIES = ("auto", "low", "medium", "high")
+# Görsel kalite kademeleri (DALL-E 3: standard, hd); maliyeti doğrudan etkiler (bkz. costs.py)
+QUALITIES = ("standard", "hd")
 
 
 def get_format(key: str) -> FormatSpec:

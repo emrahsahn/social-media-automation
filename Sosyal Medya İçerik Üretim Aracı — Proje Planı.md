@@ -1,8 +1,10 @@
-# Sosyal Medya İçerik Üretim Aracı — Proje Planı
+# Sosyal Medya Otomasyon — Proje Planı
 
 ## Özet
 
-LLM API'leri (OpenAI/Anthropic) kullanarak sosyal medya gönderileri için içerik (caption + görsel/video) üreten, local'de çıktı veren bir araç. Platformlara otomatik paylaşım yapılmayacak — üretim tamamen otomatik, paylaşım manuel.
+LLM API'leri (OpenAI/Anthropic) kullanarak özellikle Instagram gönderileri (post) ve hikayeleri (story) için içerik (caption + görsel) üreten, local'de çıktı veren ve tek tıkla Instagram'a hazır indirme imkanı sunan bir araç. Platformlara otomatik paylaşım yapılmayacak — üretim tamamen otomatik, paylaşım manuel.
+
+> **Uygulama İsmi Kararı (2026-10-16):** Uygulamanın adı web arayüzünde, sekme başlıklarında ve tüm sistemde **"Sosyal Medya Otomasyon"** olarak kullanılacaktır (SocialCraft Studio vb. yabancı isimler kaldırılacaktır).
 
 ## Kapsam Dışı (Bilinçli Kararlar)
 
@@ -13,13 +15,14 @@ LLM API'leri (OpenAI/Anthropic) kullanarak sosyal medya gönderileri için içer
 ## Akış
 
 ```
-Kullanıcı formu (tema + görsel sayısı + stil + opsiyonel referans + format + notlar)
-    → LLM, girdiyi yapılandırılmış prompt'lara ve caption/hashtag'e çevirir (her görsel için ayrı prompt)
+Kullanıcı formu (tema + sistem promptu + görsel sayısı + stil + opsiyonel referans + format + notlar)
+    → LLM, kullanıcının sistem promptuna göre girdiyi yapılandırılmış prompt'lara ve caption/hashtag'e çevirir
     → Medya üretim API'si (sadece görsel, metinsiz) — N adet, paralel/sıralı
     → Galeri: kullanıcı seçer veya "yeniden üret" der
-    → Seçilen görsel hedef tuvale getirilir (crop/resize, örn. 4:5 → 1080x1350)
+    → Seçilen görsel hedef tuvale getirilir (crop/resize, örn. 4:5 → 1080x1350 veya story → 1080x1920)
     → Kodla metin bindirme (sabit pozisyon, format kuralları)
     → Önizleme: final görsel + düzenlenebilir caption/hashtag
+    → Instagram'a hazır indirme (1080x1350 / 1080x1920 PNG + tek tıkla caption kopyalama)
     → Local'e kaydet (organize klasör yapısı)
     → Manuel paylaşım (kullanıcı kendi yapar)
 ```
@@ -33,6 +36,7 @@ Arayüzde kullanıcı ne istediğini yapılandırılmış şekilde girer. Amaç:
 | Alan | Tip | Zorunlu | Varsayılan | Kural / Not |
 | --- | --- | --- | --- | --- |
 | **Tema / konu** | Serbest metin | Evet | — | 3-200 karakter; örn. "yeni ürün tanıtımı", "indirim duyurusu" |
+| **Sistem promptu / AI Talimatı** | Serbest metin | Hayır | Instagram için optimize şablon | Kullanıcının dilediği gibi düzenleyebileceği veya değiştirebileceği yapay zeka sistem talimatı |
 | **Görsel sayısı** | Seçim (1-4) | Hayır | 2 (ön seçili) | Arayüzde kullanıcıya seçenek olarak sunulur; kararı kullanıcı verir — "2" yalnızca ön seçili başlangıçtır. Her varyasyon ayrı API çağrısı = ayrı maliyet |
 | **Görsel tipi / stil** | Dropdown | Hayır | Ürün fotoğrafı | Ürün fotoğrafı / Lifestyle / İllüstrasyon / Minimal-flat |
 | **Referans görsel** | Dosya yükleme | Hayır | — | JPG/PNG/WebP, maks. 10 MB; yüklenirse "buna benzer olsun" (B) yolu devreye girer |
@@ -47,6 +51,7 @@ Form gönderilince oluşan yapı; LLM hem görsel prompt'larını hem caption/ha
 ```json
 {
   "topic": "Yeni sezon kahve çeşidi tanıtımı",
+  "system_prompt": "Sen Instagram içerik üreticisisin; dikkat çekici, samimi Türkçe ve kanca odaklı çalış...",
   "image_count": 2,
   "style": "lifestyle",
   "reference_image": null,
@@ -143,7 +148,7 @@ Böylece her post aynı ölçüde ve metin konumu birebir tutarlı çıkar.
   - İzin verilen satır sayısı aşılırsa font boyutu kademeli küçültülür (auto-shrink); metin hâlâ sığmıyorsa kullanıcı uyarılır
 - **Marka ayarları tek config dosyasından okunur** (örn. `brand.json`): font dosyası, boyut, renk, pozisyon, gradient parametreleri — marka standardı kod içine gömülmez
 
-### 4. Local Çıktı Yönetimi
+### 4. Local Çıktı Yönetimi & Instagram İndirme
 
 Önerilen klasör yapısı:
 
@@ -156,6 +161,14 @@ Böylece her post aynı ölçüde ve metin konumu birebir tutarlı çıkar.
       caption.txt
       meta.json        ← tema, prompt, üretim tarihi vb.
 ```
+
+#### Instagram İndirme Standardı
+Kullanıcının ürettiği içerikleri doğrudan Instagram'a yükleyebilmesi için arayüzde akıllı indirme ve kopyalama sağlanır:
+- **Instagram Dikey Post (4:5):** 1080x1350 px → dosya adı: `instagram-post-1080x1350.png`
+- **Instagram Kare Post (1:1):** 1080x1080 px → dosya adı: `instagram-post-1080x1080.png`
+- **Instagram Hikaye / Story (9:16):** 1080x1920 px → dosya adı: `instagram-story-1080x1920.png`
+- **Instagram Reels Kapağı (9:16):** 1080x1920 px → dosya adı: `instagram-reels-1080x1920.png`
+- **Caption + Hashtag Kopyalama:** Tek tıkla Instagram gönderi açıklamasına yapıştırılmaya hazır panoya kopyalanır.
 
 ### 5. Arayüz (Form + Galeri + Önizleme)
 
@@ -185,7 +198,28 @@ Böylece her post aynı ölçüde ve metin konumu birebir tutarlı çıkar.
 2. `.env` ile anahtar yönetimini, retry davranışını ve üretim başına maliyet kaydını kur — tamamlandı: 2026-10-10
 3. Tek bir tema için uçtan uca akışı çalıştır: form girdisi → LLM prompt → görsel üret → hedef tuvale getir (crop/resize) → metin bindir → caption düzenle → local'e kaydet — tamamlandı: 2026-10-10 (mock modda doğrulandı: `python -m pipeline.cli --mock`; gerçek API çalıştırması `.env`'e anahtar konulunca yapılacak; sağlayıcı kararı: OpenAI tek anahtar). Caption düzenleme arayüzü 6. adımda.
 4. Format spesifikasyonunu netleştir ve sabitle: Türkçe destekli font, taşma kuralları (wrap/limit/auto-shrink), renk, pozisyon; marka ayarlarını tek config dosyasında topla — tamamlandı: 2026-10-11 (`brand.json` tek kaynak: font/punto/renk/pozisyon/gradient/taşma; wrap + auto-shrink + max_chars limiti mock testlerle doğrulandı)
-5. Referans görsel desteğini ekle (önce B1 stil çözümleme, sonra B2 edit API)
-6. Galeri + "yeniden üret" akışını ve önizlemede caption/hashtag düzenlemeyi ekle
-7. Birden fazla post'u toplu üretecek bir script/CLI'ye genişlet
-8. (Opsiyonel, çok sonra) Video üretimini dahil et
+5. Referans görsel desteğini ekle (önce B1 stil çözümleme, sonra B2 edit API) — tamamlandı: 2026-10-13 (`--reference-image` + `--reference-mode b1|b2`; B1: vision çözümleme → prompt'a stil yansıması, B2: görsel edit API'ye doğrudan input; mock ile doğrulandı, gerçek vision/edit çağrısı anahtar sonrası test edilecek)
+6. Galeri + "yeniden üret" akışını ve önizlemede caption/hashtag düzenlemeyi ekle — tamamlandı: 2026-10-13 (FastAPI + modern karanlık mod Web Stüdyosu: form, galeri şeridi, canlı metin bindirme önizlemesi, caption/hashtag düzenleme, tekil varyasyon yeniden üretme ve çıktı galerisi; http://localhost:8000)
+7. Kullanıcı Tanımlı Sistem Promptu & Instagram İndirme Geliştirmesi — tamamlandı: 2026-10-16
+   - Uygulama adının web arayüzünde (sayfa başlığı, logo, tab başlığı vb.) **"Sosyal Medya Otomasyon"** olarak güncellenmesi tamamlandı.
+   - Web arayüzüne kullanıcının serbestçe düzenleyebileceği "Sistem Promptu / AI Talimatı" metin alanı eklendi (varsayılan Instagram optimizasyonlu şablon ve sıfırlama butonu ile).
+   - Pipeline (`llm.py`, `generate.py`, `web.py`) katmanına dinamik sistem promptu aktarımı sağlandı.
+   - İndirme butonlarının ve indirilen dosyaların Instagram gönderi/hikaye formatlarına göre akıllı adlandırılması (`instagram-story-1080x1920-v1.png`, `instagram-post-1080x1350-v1.png` vb.) ve galeri indirmeleri tamamlandı.
+   - **Anahtar & Şifre Yönetimi:** OpenAI/Anthropic API anahtarları ve uygulama giriş şifresi doğrudan `.env` dosyasında (ve Vercel ortamında Environment Variables panelinde) tutulacak şekilde yapılandırıldı.
+   - **Login Paneli:** `.env` dosyasındaki `APP_PASSWORD` değeri ile doğrulanan şık giriş modalı, `HttpOnly` oturum çerezi, rate limit koruması ve korumalı `/api/*` endpoint'leri tamamlandı.
+8. **Firma Logosu & Kullanıcı Kontrollü Konumlandırma (Filigran)** — tamamlandı: 2026-10-17
+   - **Kullanıcı Kararı & Konum Seçimi:** Logonun nereye yerleştirileceğine (Sol Üst, Üst Orta, Sağ Üst, Sol Alt, Orta/Filigran, Sağ Alt) tamamen kullanıcının karar vermesi sağlandı.
+   - **Boyut & Şeffaflık:** Küçük (%13), Orta (%18), Büyük (%26) boyut ve %100, %80, %50 opaklık ayarları eklendi.
+   - **İnteraktif Canlı Önizleme:** Logo yüklendiğinde ve konum butonlarına tıklandığında sağdaki Instagram telefon simülatörü üzerinde anlık olarak pozisyon ve boyut canlı güncellenir.
+   - **Üretim & Düzenleme Pipeline Entegrasyonu:** `pipeline/overlay.py` içinde alfa kompozitli `overlay_logo()` geliştirildi; üretim esnasında veya üretim sonrasındaki "Görsel Metni & Logo Konumunu Düzenle" panelinden API harcamadan logo konumu tek tıkla yeniden konumlandırılabilir.
+   - **Monokrom Tasarım Korundu:** Siyah-beyaz/monokrom tasarım bütünlüğü korundu; sadece Instagram logosu renkli tutuldu.
+9. **Vercel'e Yayınlama Uyarlaması, Stateless Mimari & Tarayıcı Hafızası (IndexedDB)** — tamamlandı: 2026-10-17
+   - **Stateless "At Çıktıyı Al Çık" Mimarisi:** Harici blob/S3 depolama maliyeti ve karmaşıklığı olmadan, in-memory base64 data URL'ler üzerinden çalışacak şekilde uyarlandı (`pipeline/canvas.py`, `pipeline/generate.py`, `pipeline/web.py`).
+   - **Salt-Okunur Dosya Sistemi Uyumu:** Vercel serverless ortamında disk salt-okunur olduğunda yerel `outputs/` yazımları `OSError` yakalayarak güvenle es geçilir, API doğrudan in-memory veriyi döndürür.
+   - **Instagram JPEG Standardizasyonu:** Vercel'in 4.5 MB payload limiti ve Instagram'ın yerel formatı gözetilerek çıktılar optimize JPEG (%95 kalite) formatına getirildi (~350 KB tuval).
+   - **Tarayıcı Hafızası (IndexedDB - `StudioDB`):** Üretilen son 20 gönderi, caption ve hashtag'ler kullanıcının tarayıcısında IndexedDB (`SosyalMedyaStudioDB`) üzerinde saklanır. Sayfa yenilense veya sunucu kapansa bile içerikler kaybolmaz.
+   - **Stüdyoya Geri Yükleme:** Çıktı Galerisi'ndeki herhangi bir gönderi "📱 Stüdyoda Aç" butonu ile canlı Instagram telefon simülatörüne anında geri yüklenebilir.
+   - **Vercel Giriş Noktaları:** `api/index.py` (ASGI köprüsü), `vercel.json` (fonksiyon süresi 60s, `includeFiles` ile şablon ve fontlar, URL rewrite kuralları) ve `.vercelignore` oluşturuldu.
+   - **Test Paketi:** 36/36 pytest testi (Vercel ASGI entry point, salt-okunur dosya sistemi simülasyonu, data URL overlay preview, güvenlik ve auth testleri) başarıyla geçmektedir.
+10. Birden fazla post'u toplu üretecek bir script/CLI'ye genişlet
+11. (Opsiyonel, çok sonra) Video üretimini dahil et

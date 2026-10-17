@@ -1,4 +1,4 @@
-"""Görsel üretim: OpenAI gpt-image-1 veya mock üretici.
+"""Görsel üretim: OpenAI DALL-E (dall-e-3 / dall-e-2) veya mock üretici.
 
 Mock üretici, prompt'tan türetilen deterministik (aynı prompt → aynı görsel)
 gradyan + yumuşak lekelerden oluşan metinsiz bir arka plan üretir; böylece
@@ -17,7 +17,7 @@ from PIL import Image, ImageDraw, ImageFilter
 from pipeline.config import get_api_key
 from pipeline.retry import call_with_retry
 
-DEFAULT_IMAGE_MODEL = "gpt-image-1"
+DEFAULT_IMAGE_MODEL = "dall-e-3"
 
 
 def _mock_image_bytes(size_str: str, seed_text: str) -> bytes:
@@ -58,16 +58,21 @@ def generate_image(
     prompt: str,
     *,
     size: str,
-    quality: str = "medium",
+    quality: str = "standard",
     mock: bool = False,
     model: str = DEFAULT_IMAGE_MODEL,
+    reference_image: bytes | None = None,
 ) -> tuple[bytes, dict]:
     """Tek görsel üretir; `(png_bytes, meta)` döner.
 
+    `reference_image` verilirse planın B2 yolu çalışır: görselin kendisi
+    edit çağrısına girer ("bu stile benzer, şu değişikliklerle").
     `meta`: maliyet/istatistik kaydı için {"provider", "model", "size", "quality"}.
     """
     if mock:
-        png = _mock_image_bytes(size, prompt)
+        # Mock'ta referans tohuma katılır: aynı referans → aynı varyasyon
+        seed = prompt if reference_image is None else prompt + reference_image[:256].hex()
+        png = _mock_image_bytes(size, seed)
         return png, {"provider": "mock", "model": "mock-image", "size": size, "quality": quality}
 
     get_api_key("openai")
@@ -76,7 +81,30 @@ def generate_image(
     client = OpenAI()
 
     def _call():
-        return client.images.generate(model=model, prompt=prompt, size=size, quality=quality)
+        if reference_image is not None:
+            # Plan B2: doğrudan edit
+            if model == "dall-e-3":
+                raise ValueError(
+                    "OpenAI DALL-E 3 doğrudan görsel düzenleme (B2) desteklemez. "
+                    "Lütfen '--reference-mode b1' (stil analizi) modunu kullanın veya "
+                    "modeli 'dall-e-2' olarak belirleyin."
+                )
+            return client.images.edit(
+                image=("reference.png", reference_image, "image/png"),
+                prompt=prompt,
+                size=size,
+                response_format="b64_json",
+            )
+
+        kwargs: dict = {
+            "model": model,
+            "prompt": prompt,
+            "size": size,
+            "response_format": "b64_json",
+        }
+        if model == "dall-e-3":
+            kwargs["quality"] = quality
+        return client.images.generate(**kwargs)
 
     resp = call_with_retry(_call)
     b64 = getattr(resp.data[0], "b64_json", None)
