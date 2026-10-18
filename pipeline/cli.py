@@ -27,9 +27,10 @@ from pipeline.generate import run_pipeline
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="pipeline.cli",
-        description="Tek tema için uçtan uca sosyal medya gönderisi üretimi.",
+        description="Tek tema veya toplu sosyal medya gönderisi üretimi.",
     )
-    parser.add_argument("--topic", required=True, help="Tema / konu (zorunlu)")
+    parser.add_argument("--topic", default=None, help="Tema / konu (tekli üretimde zorunlu)")
+    parser.add_argument("--batch-file", default=None, help="Toplu üretim girdi dosyası (.txt, .json, .csv)")
     parser.add_argument("--count", type=int, default=2, help="Görsel sayısı (1-4, varsayılan 2)")
     parser.add_argument("--style", default="product_photo", choices=STYLES, help="Görsel tipi")
     parser.add_argument("--format", default="post_4x5", choices=list(FORMATS), help="Hedef format")
@@ -60,6 +61,21 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+
+    if args.batch_file:
+        from pipeline.batch import main as batch_main
+        batch_argv = ["--file", args.batch_file, "--count", str(args.count), "--style", args.style,
+                      "--format", args.format, "--provider", args.provider, "--quality", args.quality]
+        if args.mock:
+            batch_argv.append("--mock")
+        if args.out_root:
+            batch_argv.extend(["--out-root", args.out_root])
+        return batch_main(batch_argv)
+
+    if not args.topic:
+        print("HATA: --topic veya --batch-file argümanlarından biri belirtilmelidir.", file=sys.stderr)
+        return 1
+
     payload = {
         "topic": args.topic,
         "image_count": args.count,

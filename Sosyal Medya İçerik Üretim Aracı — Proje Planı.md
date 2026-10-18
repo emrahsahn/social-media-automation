@@ -221,5 +221,5 @@ Kullanıcının ürettiği içerikleri doğrudan Instagram'a yükleyebilmesi iç
    - **Stüdyoya Geri Yükleme:** Çıktı Galerisi'ndeki herhangi bir gönderi "📱 Stüdyoda Aç" butonu ile canlı Instagram telefon simülatörüne anında geri yüklenebilir.
    - **Vercel Giriş Noktaları:** `api/index.py` (ASGI köprüsü), `vercel.json` (fonksiyon süresi 60s, `includeFiles` ile şablon ve fontlar, URL rewrite kuralları) ve `.vercelignore` oluşturuldu.
    - **Test Paketi:** 36/36 pytest testi (Vercel ASGI entry point, salt-okunur dosya sistemi simülasyonu, data URL overlay preview, güvenlik ve auth testleri) başarıyla geçmektedir.
-10. Birden fazla post'u toplu üretecek bir script/CLI'ye genişlet
+10. Birden fazla post'u toplu üretecek bir script/CLI'ye genişlet — tamamlandı: 2026-10-18 (`pipeline/batch.py` ve `pipeline/cli.py --batch-file`; JSON/CSV/TXT desteği, kümülatif maliyet ve raporlama, 40/40 test başarılı)
 11. (Opsiyonel, çok sonra) Video üretimini dahil et

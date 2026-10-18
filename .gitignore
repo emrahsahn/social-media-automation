@@ -26,3 +26,8 @@ node_modules/
 .DS_Store
 Thumbs.db
 *.log
+.claude/
+
+# check dosyaları
+SYSTEM_CHECK.md
+SECURITY_FINDINGS.md

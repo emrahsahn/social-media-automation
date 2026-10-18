@@ -2284,13 +2284,22 @@
 
         // API Status Pill (Monochrome)
         const apiText = document.getElementById('apiStatusText');
-        if (data.keys && (data.keys.openai || data.keys.anthropic)) {
+        const checkMockEl = document.getElementById('checkMock');
+        const hasAnyKey = data.keys && (data.keys.openai || data.keys.anthropic);
+        if (hasAnyKey) {
           apiText.innerText = 'API Aktif';
-          document.getElementById('checkMock').checked = false;
+          checkMockEl.checked = false;
         } else {
           apiText.innerText = 'Mock Modu';
-          document.getElementById('checkMock').checked = true;
+          checkMockEl.checked = true;
         }
+
+        checkMockEl.onchange = function() {
+          if (!checkMockEl.checked && !hasAnyKey) {
+            alert('⚠️ Sistemde API anahtarı (OPENAI_API_KEY) tanımlı değil.\n\nGerçek API ile üretim yapabilmek için lütfen .env dosyasına OpenAI anahtarınızı ekleyin. Sistem şimdilik Mock Modunda kalacaktır.');
+            checkMockEl.checked = true;
+          }
+        };
 
       } catch (err) {
         console.error('Config fetch failed:', err);
