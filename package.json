@@ -1,0 +1,33 @@
+{
+  "name": "sosyal-medya-otomasyonu",
+  "version": "1.0.0",
+  "description": "Tek bir temadan (konu/metin) Instagram için hazır gönderi paketleri üreten uçtan uca içerik hattı: LLM destekli görsel promptu + caption + hashtag üretimi, DALL-E görsel üretimi, marka kimliğine göre metin ve logo bindirme, ve tarayıcıda çalışan tek sayfalık bir Web Stüdyo.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emrahsahn/social-media-automation.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/emrahsahn/social-media-automation/issues"
+  },
+  "homepage": "https://github.com/emrahsahn/social-media-automation#readme",
+  "dependencies": {
+    "canvas-confetti": "^1.9.4",
+    "lucide-react": "^1.61.0",
+    "next": "^16.4.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  }
+}
