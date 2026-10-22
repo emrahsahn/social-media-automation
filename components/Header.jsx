@@ -27,19 +27,22 @@ export default function Header({
       </div>
 
       <div className="header-actions">
+        {/* Maliyet Rozeti */}
         <div className="cost-badge" title="Toplam tahmini harcama">
           <DollarSign size={13} />
           <span className="desktop-only" style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Maliyet: </span>
           <span style={{ color: '#10B981', fontWeight: 800 }}>${totalCost.toFixed(3)}</span>
         </div>
 
+        {/* Mod Rozeti */}
         <div className="cost-badge mode-badge">
           <Sparkles size={13} color={isMock ? '#eab308' : '#10b981'} />
           <span className="desktop-only">{isMock ? 'Mock Mod' : 'OpenAI'}</span>
         </div>
 
+        {/* Masaüstünde Üst Barda, Mobilde Alt Menüde */}
         <button
-          className="icon-btn"
+          className="icon-btn desktop-only"
           onClick={onOpenBatch}
           title="Toplu Üretim (Batch)"
           id="btnHeaderBatch"
@@ -48,7 +51,7 @@ export default function Header({
         </button>
 
         <button
-          className="icon-btn"
+          className="icon-btn desktop-only"
           onClick={onToggleTheme}
           title="Tema Değiştir"
           id="btnHeaderTheme"

@@ -2,7 +2,7 @@
    SOSYAL MEDYA OTOMASYON — NEXT.JS DESIGN SYSTEM
    - Ultra-premium monokrom siyah/beyaz zemin
    - Canlı Instagram gradyan ikonik vurguları
-   - Tam Mobil & Masaüstü Duyarlı (Responsive) Tasarım
+   - Mobil Uygulama Deneyimi: Temiz Header + Alt Menü Çubuğu (Bottom Nav)
    ========================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap');
@@ -165,11 +165,11 @@ html, body {
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 6px 10px;
+  padding: 6px 12px;
   border-radius: 999px;
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: var(--text-muted);
 }
@@ -195,41 +195,77 @@ html, body {
   transform: translateY(-1px);
 }
 
-/* Mobil Sekme Değiştirici (Masaüstünde gizli, mobilde aktif) */
-.mobile-tabs-container {
+/* Mobil Alt Menü Çubuğu (Native App Style Bottom Navigation) */
+.mobile-bottom-nav {
   display: none;
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--border-subtle);
-  padding: 8px 12px;
-  gap: 8px;
-  position: sticky;
-  top: 59px;
-  z-index: 40;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: rgba(10, 10, 12, 0.94);
+  backdrop-filter: blur(25px);
+  border-top: 1px solid var(--border-subtle);
+  height: 64px;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  align-items: center;
+  justify-content: space-around;
 }
 
-.mobile-tab-btn {
+[data-theme="light"] .mobile-bottom-nav {
+  background: rgba(255, 255, 255, 0.94);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.mobile-bottom-tab {
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-strong);
-  background: var(--bg-input);
-  color: var(--text-muted);
-  font-family: 'Outfit', sans-serif;
-  font-size: 0.88rem;
+  gap: 3px;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.72rem;
   font-weight: 700;
   cursor: pointer;
   transition: var(--transition);
+  padding: 6px 0;
+  touch-action: manipulation;
 }
 
-.mobile-tab-btn.active {
-  background: var(--btn-primary-bg);
-  color: var(--btn-primary-text);
-  border-color: var(--btn-primary-bg);
-  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.15);
+.mobile-bottom-tab.active {
+  color: var(--text-main);
+}
+
+.mobile-bottom-tab.active svg {
+  color: var(--text-main);
+  transform: translateY(-1px);
+}
+
+.tab-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-badge {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Layout */
@@ -691,7 +727,7 @@ html, body {
 /* Toast */
 .toast-msg {
   position: fixed;
-  bottom: 1.5rem;
+  bottom: 5rem;
   right: 1.5rem;
   background: var(--bg-elevated);
   border: 1px solid var(--border-focus);
@@ -718,7 +754,7 @@ html, body {
    ========================================================= */
 
 @media (max-width: 1024px) {
-  .mobile-tabs-container {
+  .mobile-bottom-nav {
     display: flex;
   }
 
@@ -728,14 +764,15 @@ html, body {
 
   .main-container {
     grid-template-columns: 1fr;
-    padding: 1rem;
-    gap: 1.5rem;
+    padding: 0.85rem 1rem 85px 1rem; /* Alttan menü kadar boşluk bırak */
+    gap: 1.25rem;
   }
 }
 
 @media (max-width: 640px) {
   .app-header {
-    padding: 0.75rem 1rem;
+    padding: 0.65rem 1rem;
+    height: 52px;
   }
 
   .desktop-only {
@@ -743,27 +780,27 @@ html, body {
   }
 
   .brand-title {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .brand-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
   }
 
   .brand-icon svg {
-    width: 19px;
-    height: 19px;
+    width: 17px;
+    height: 17px;
   }
 
-  .main-container {
-    padding: 0.75rem;
-    gap: 1rem;
+  .cost-badge {
+    padding: 4px 8px;
+    font-size: 0.74rem;
   }
 
   .sidebar-panel {
-    padding: 1.25rem 1rem;
+    padding: 1.15rem 0.9rem;
     border-radius: var(--radius-md);
   }
 
@@ -779,8 +816,8 @@ html, body {
   }
 
   .phone-dynamic-island {
-    width: 90px;
-    height: 22px;
+    width: 86px;
+    height: 20px;
     margin: 4px auto 8px;
   }
 
@@ -813,7 +850,7 @@ html, body {
   }
 
   .toast-msg {
-    bottom: 1rem;
+    bottom: 5rem;
     right: 1rem;
     left: 1rem;
     text-align: center;

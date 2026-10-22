@@ -5,7 +5,7 @@ import Header from '../components/Header';
 import GeneratorForm from '../components/GeneratorForm';
 import InstagramMockup from '../components/InstagramMockup';
 import BatchModal from '../components/BatchModal';
-import { SlidersHorizontal, Smartphone } from 'lucide-react';
+import { SlidersHorizontal, Smartphone, Layers, Sun, Moon } from 'lucide-react';
 
 export default function Home() {
   const [theme, setTheme] = useState('dark');
@@ -94,7 +94,7 @@ export default function Home() {
       if (!isInitial) {
         showToast('🎉 Yeni Instagram gönderi paketi hazırlandı!');
         // Mobilde kullanıcı direkt önizlemeyi görsün diye önizleme sekmesine geç
-        if (window.innerWidth < 1024) {
+        if (typeof window !== 'undefined' && window.innerWidth < 1024) {
           setActiveMobileTab('preview');
         }
       }
@@ -142,7 +142,7 @@ export default function Home() {
       setPosts(allGenerated);
       setCurrentIndex(0);
       showToast(`✅ ${allGenerated.length} adet gönderi başarıyla üretildi!`);
-      if (window.innerWidth < 1024) {
+      if (typeof window !== 'undefined' && window.innerWidth < 1024) {
         setActiveMobileTab('preview');
       }
     }
@@ -161,26 +161,6 @@ export default function Home() {
         onToggleTheme={toggleTheme}
         onOpenBatch={() => setBatchOpen(true)}
       />
-
-      {/* Mobil Sekme Değiştirici (Sadece mobil/tablette görünür) */}
-      <div className="mobile-tabs-container">
-        <button
-          className={`mobile-tab-btn ${activeMobileTab === 'form' ? 'active' : ''}`}
-          onClick={() => setActiveMobileTab('form')}
-          id="btnTabForm"
-        >
-          <SlidersHorizontal size={16} />
-          İçerik Stüdyosu
-        </button>
-        <button
-          className={`mobile-tab-btn ${activeMobileTab === 'preview' ? 'active' : ''}`}
-          onClick={() => setActiveMobileTab('preview')}
-          id="btnTabPreview"
-        >
-          <Smartphone size={16} />
-          Canlı Önizleme {posts.length > 0 && `(${posts.length})`}
-        </button>
-      </div>
 
       <main className="main-container">
         {/* Sol Panel: İçerik Üretim Kontrolleri */}
@@ -207,6 +187,48 @@ export default function Home() {
           />
         </div>
       </main>
+
+      {/* Modern Mobil Alt Navigasyon Çubuğu (Native App Bottom Bar) */}
+      <nav className="mobile-bottom-nav">
+        <button
+          className={`mobile-bottom-tab ${activeMobileTab === 'form' ? 'active' : ''}`}
+          onClick={() => setActiveMobileTab('form')}
+          id="btnBottomTabForm"
+        >
+          <SlidersHorizontal size={20} />
+          <span>Stüdyo</span>
+        </button>
+
+        <button
+          className={`mobile-bottom-tab ${activeMobileTab === 'preview' ? 'active' : ''}`}
+          onClick={() => setActiveMobileTab('preview')}
+          id="btnBottomTabPreview"
+        >
+          <div className="tab-icon-wrapper">
+            <Smartphone size={20} />
+            {posts.length > 0 && <span className="tab-badge">{posts.length}</span>}
+          </div>
+          <span>Önizleme</span>
+        </button>
+
+        <button
+          className="mobile-bottom-tab"
+          onClick={() => setBatchOpen(true)}
+          id="btnBottomTabBatch"
+        >
+          <Layers size={20} />
+          <span>Toplu</span>
+        </button>
+
+        <button
+          className="mobile-bottom-tab"
+          onClick={toggleTheme}
+          id="btnBottomTabTheme"
+        >
+          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+          <span>{theme === 'dark' ? 'Aydınlık' : 'Karanlık'}</span>
+        </button>
+      </nav>
 
       {/* Toplu Üretim Penceresi */}
       <BatchModal

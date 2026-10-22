@@ -34,7 +34,7 @@ export default function GeneratorForm({
 
   return (
     <div className="sidebar-panel">
-      <div className="panel-header">
+      <div className="panel-header desktop-only">
         <div>
           <h2 className="panel-title">İçerik Stüdyosu</h2>
           <p className="panel-subtitle">Yapay zeka ile görsel, metin ve tuval üretimi</p>
