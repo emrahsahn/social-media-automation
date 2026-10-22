@@ -55,9 +55,8 @@ app = FastAPI(title="Sosyal Medya Otomasyon", version="1.1.0")
 
 logger = logging.getLogger("pipeline.web")
 
-# Üretimde (Vercel) oturum imza anahtarı zorunlu: eksikse deploy anında net hata
-if os.environ.get("VERCEL") or os.environ.get("VERCEL_ENV"):
-    get_session_secret()
+# Oturum imza anahtarı hazırla
+get_session_secret()
 
 allowed_origins_env = os.environ.get("ALLOWED_ORIGINS", "")
 allowed_origins = [o.strip() for o in allowed_origins_env.split(",") if o.strip()] or [

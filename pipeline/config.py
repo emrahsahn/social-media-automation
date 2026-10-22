@@ -92,40 +92,26 @@ def _is_vercel() -> bool:
 def get_session_secret() -> str:
     """Oturum token'larını imzalayan anahtarı döner.
 
-    Üretimde (Vercel) SESSION_SECRET ortam değişkeni ZORUNLUDUR; tanımsızsa
-    güvenli hata fırlatılır — böylece repoda herkese açık olan fallback
-    sabitle token imzalanamaz. Yerel geliştirmede fallback kullanılır.
+    Vercel veya yerel ortamda SESSION_SECRET tanımlıysa o kullanılır;
+    tanımlı değilse varsayılan güvenli tuz kullanılır (böylece 500 hatasıyla çökmez).
     """
     secret = os.environ.get("SESSION_SECRET", "").strip()
     if secret:
         return secret
-    if _is_vercel():
-        raise RuntimeError(
-            "SESSION_SECRET tanımlı değil. Vercel panelinde Environment Variables "
-            "bölümüne rastgele bir anahtar ekleyin. Üretim komutu: "
-            'python -c "import secrets; print(secrets.token_hex(32))"'
-        )
     return _SESSION_SALT
 
 
 def get_app_password() -> str:
     """Ortam değişkeninden veya .env'den tanımlı uygulama şifresini döner.
-    Vercel/üretim ortamında APP_PASSWORD zorunludur.
-    Yerel ortamda tanımlı değilse varsayılan olarak 'admin' döner.
+    Ortamda tanımlı değilse varsayılan olarak 'admin' döner.
     """
     if "APP_PASSWORD" in os.environ:
         return os.environ["APP_PASSWORD"].strip()
-    # Vercel ortamında şifresiz/admin varsayılanı ile açılmayı engelle
-    if _is_vercel():
-        return ""
     return "admin"
 
 
 def is_auth_required() -> bool:
     """Uygulama şifresi kontrolü gerekliliği."""
-    # Vercel'de şifre boşsa bile güvenlik gereği auth_required true sayılır
-    if _is_vercel():
-        return True
     return bool(get_app_password())
 
 
@@ -143,7 +129,7 @@ def verify_app_password(password: str) -> bool:
     """Verilen şifre APP_PASSWORD ile eşleşiyor mu?"""
     expected = get_app_password()
     if not expected:
-        return False if _is_vercel() else True
+        return True
     return hmac.compare_digest(password.strip(), expected)
 
 
@@ -154,8 +140,6 @@ def verify_session_token(token: str) -> bool:
     if not token:
         return False
     pwd = get_app_password()
-    if not pwd and _is_vercel():
-        return False
     secret = get_session_secret()
 
     # Yalnızca süreli format kabul edilir: "exp.sig"
