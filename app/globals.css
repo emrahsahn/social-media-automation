@@ -2,7 +2,7 @@
    SOSYAL MEDYA OTOMASYON — NEXT.JS DESIGN SYSTEM
    - Ultra-premium monokrom siyah/beyaz zemin
    - Canlı Instagram gradyan ikonik vurguları
-   - Cam morfolojisi (Glassmorphism) ve mikro-animasyonlar
+   - Tam Mobil & Masaüstü Duyarlı (Responsive) Tasarım
    ========================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap');
@@ -103,25 +103,25 @@ html, body {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(10, 10, 12, 0.85);
+  background: rgba(10, 10, 12, 0.88);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-subtle);
-  padding: 0.9rem 1.75rem;
+  padding: 0.85rem 1.75rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .brand-wrapper {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .brand-icon {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
   background: var(--insta-gradient);
   display: flex;
@@ -157,24 +157,21 @@ html, body {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .cost-badge {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
+  gap: 5px;
+  padding: 6px 10px;
   border-radius: 999px;
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   font-size: 0.78rem;
   font-weight: 700;
   color: var(--text-muted);
-}
-
-.cost-badge span {
-  color: #10B981;
 }
 
 .icon-btn {
@@ -189,12 +186,50 @@ html, body {
   justify-content: center;
   cursor: pointer;
   transition: var(--transition);
+  flex-shrink: 0;
 }
 
 .icon-btn:hover {
   background: var(--bg-card-hover);
   border-color: var(--border-strong);
   transform: translateY(-1px);
+}
+
+/* Mobil Sekme Değiştirici (Masaüstünde gizli, mobilde aktif) */
+.mobile-tabs-container {
+  display: none;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 8px 12px;
+  gap: 8px;
+  position: sticky;
+  top: 59px;
+  z-index: 40;
+}
+
+.mobile-tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-input);
+  color: var(--text-muted);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.mobile-tab-btn.active {
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border-color: var(--btn-primary-bg);
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.15);
 }
 
 /* Layout */
@@ -206,13 +241,11 @@ html, body {
   max-width: 1720px;
   margin: 0 auto;
   min-height: calc(100vh - 75px);
+  width: 100%;
 }
 
-@media (max-width: 1200px) {
-  .main-container {
-    grid-template-columns: 1fr;
-    gap: 2.5rem;
-  }
+.panel-wrapper {
+  width: 100%;
 }
 
 /* Sidebar / Studio Form */
@@ -223,9 +256,10 @@ html, body {
   padding: 1.75rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.4rem;
   box-shadow: var(--shadow-glass);
   height: fit-content;
+  width: 100%;
 }
 
 .panel-header {
@@ -275,7 +309,7 @@ html, body {
   border-radius: var(--radius-md);
   color: var(--text-main);
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 16px; /* iOS Safari otomatik zoom yapmasın diye 16px */
   line-height: 1.5;
   padding: 0.85rem 1rem;
   resize: vertical;
@@ -301,12 +335,13 @@ html, body {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   color: var(--text-muted);
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 600;
-  padding: 4px 10px;
+  padding: 6px 11px;
   border-radius: 999px;
   cursor: pointer;
   transition: var(--transition);
+  touch-action: manipulation;
 }
 
 .topic-chip:hover {
@@ -332,7 +367,7 @@ html, body {
   background: var(--bg-input);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
-  padding: 0.65rem 0.5rem;
+  padding: 0.7rem 0.5rem;
   text-align: center;
   cursor: pointer;
   font-size: 0.78rem;
@@ -343,6 +378,7 @@ html, body {
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  touch-action: manipulation;
 }
 
 .pill-item:hover {
@@ -382,6 +418,8 @@ html, body {
   gap: 10px;
   box-shadow: 0 8px 30px rgba(255, 255, 255, 0.18);
   margin-top: 0.5rem;
+  min-height: 48px;
+  touch-action: manipulation;
 }
 
 .submit-btn:hover:not(:disabled) {
@@ -402,6 +440,7 @@ html, body {
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
+  width: 100%;
 }
 
 .variation-tabs {
@@ -413,6 +452,8 @@ html, body {
   padding: 5px;
   border-radius: 999px;
   box-shadow: var(--shadow-glass);
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .tab-btn {
@@ -425,6 +466,7 @@ html, body {
   border-radius: 999px;
   cursor: pointer;
   transition: var(--transition);
+  white-space: nowrap;
 }
 
 .tab-btn.active {
@@ -582,6 +624,8 @@ html, body {
   gap: 12px;
   flex-wrap: wrap;
   justify-content: center;
+  width: 100%;
+  max-width: 420px;
 }
 
 .action-btn {
@@ -597,6 +641,8 @@ html, body {
   align-items: center;
   gap: 8px;
   transition: var(--transition);
+  min-height: 44px;
+  touch-action: manipulation;
 }
 
 .action-btn:hover {
@@ -621,18 +667,20 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
+  padding: 1.25rem;
 }
 
 .modal-content {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
-  padding: 2.25rem;
+  padding: 2rem;
   width: 100%;
   max-width: 580px;
   box-shadow: var(--shadow-glass);
   animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 @keyframes modalIn {
@@ -643,12 +691,12 @@ html, body {
 /* Toast */
 .toast-msg {
   position: fixed;
-  bottom: 2rem;
-  right: 2rem;
+  bottom: 1.5rem;
+  right: 1.5rem;
   background: var(--bg-elevated);
   border: 1px solid var(--border-focus);
   color: var(--text-main);
-  padding: 12px 20px;
+  padding: 12px 18px;
   border-radius: var(--radius-md);
   font-size: 0.85rem;
   font-weight: 700;
@@ -663,4 +711,112 @@ html, body {
 @keyframes toastSlide {
   from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================================
+   MOBİL & TABLET DUYARLILIK (RESPONSIVE BREAKPOINTS)
+   ========================================================= */
+
+@media (max-width: 1024px) {
+  .mobile-tabs-container {
+    display: flex;
+  }
+
+  .mobile-hidden {
+    display: none !important;
+  }
+
+  .main-container {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .desktop-only {
+    display: none !important;
+  }
+
+  .brand-title {
+    font-size: 1rem;
+  }
+
+  .brand-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  .brand-icon svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .main-container {
+    padding: 0.75rem;
+    gap: 1rem;
+  }
+
+  .sidebar-panel {
+    padding: 1.25rem 1rem;
+    border-radius: var(--radius-md);
+  }
+
+  .phone-mockup {
+    border-radius: 28px;
+    padding: 6px;
+    border-width: 3px;
+    max-width: 100%;
+  }
+
+  .phone-screen {
+    border-radius: 22px;
+  }
+
+  .phone-dynamic-island {
+    width: 90px;
+    height: 22px;
+    margin: 4px auto 8px;
+  }
+
+  .pill-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .pill-item {
+    padding: 0.6rem 0.3rem;
+    font-size: 0.72rem;
+  }
+
+  .stage-actions {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .action-btn {
+    width: 100%;
+    justify-content: center;
+    font-size: 0.9rem;
+    padding: 0.85rem;
+  }
+
+  .modal-content {
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .toast-msg {
+    bottom: 1rem;
+    right: 1rem;
+    left: 1rem;
+    text-align: center;
+    justify-content: center;
+  }
 }

@@ -5,6 +5,7 @@ import Header from '../components/Header';
 import GeneratorForm from '../components/GeneratorForm';
 import InstagramMockup from '../components/InstagramMockup';
 import BatchModal from '../components/BatchModal';
+import { SlidersHorizontal, Smartphone } from 'lucide-react';
 
 export default function Home() {
   const [theme, setTheme] = useState('dark');
@@ -12,6 +13,7 @@ export default function Home() {
   const [isMock, setIsMock] = useState(true);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
+  const [activeMobileTab, setActiveMobileTab] = useState('form'); // 'form' | 'preview'
 
   // Form Durumu
   const [formData, setFormData] = useState({
@@ -48,9 +50,8 @@ export default function Home() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // Sayfa açıldığında ilk önizlemeyi yükle (Placeholder bırakma kuralı)
+  // Sayfa açıldığında ilk önizlemeyi yükle
   useEffect(() => {
-    // Config al
     fetch('/api/config')
       .then(res => res.json())
       .then(data => {
@@ -61,7 +62,6 @@ export default function Home() {
       })
       .catch(() => {});
 
-    // İlk canlı önizlemeyi üret
     handleGenerate(true);
   }, []);
 
@@ -93,6 +93,10 @@ export default function Home() {
 
       if (!isInitial) {
         showToast('🎉 Yeni Instagram gönderi paketi hazırlandı!');
+        // Mobilde kullanıcı direkt önizlemeyi görsün diye önizleme sekmesine geç
+        if (window.innerWidth < 1024) {
+          setActiveMobileTab('preview');
+        }
       }
     } catch (err) {
       showToast(`Hata: ${err.message}`);
@@ -138,6 +142,9 @@ export default function Home() {
       setPosts(allGenerated);
       setCurrentIndex(0);
       showToast(`✅ ${allGenerated.length} adet gönderi başarıyla üretildi!`);
+      if (window.innerWidth < 1024) {
+        setActiveMobileTab('preview');
+      }
     }
     setBatchRunning(false);
     setBatchOpen(false);
@@ -155,26 +162,50 @@ export default function Home() {
         onOpenBatch={() => setBatchOpen(true)}
       />
 
+      {/* Mobil Sekme Değiştirici (Sadece mobil/tablette görünür) */}
+      <div className="mobile-tabs-container">
+        <button
+          className={`mobile-tab-btn ${activeMobileTab === 'form' ? 'active' : ''}`}
+          onClick={() => setActiveMobileTab('form')}
+          id="btnTabForm"
+        >
+          <SlidersHorizontal size={16} />
+          İçerik Stüdyosu
+        </button>
+        <button
+          className={`mobile-tab-btn ${activeMobileTab === 'preview' ? 'active' : ''}`}
+          onClick={() => setActiveMobileTab('preview')}
+          id="btnTabPreview"
+        >
+          <Smartphone size={16} />
+          Canlı Önizleme {posts.length > 0 && `(${posts.length})`}
+        </button>
+      </div>
+
       <main className="main-container">
         {/* Sol Panel: İçerik Üretim Kontrolleri */}
-        <GeneratorForm
-          formData={formData}
-          setFormData={setFormData}
-          onSubmit={() => handleGenerate(false)}
-          loading={loading}
-        />
+        <div className={`panel-wrapper ${activeMobileTab !== 'form' ? 'mobile-hidden' : ''}`}>
+          <GeneratorForm
+            formData={formData}
+            setFormData={setFormData}
+            onSubmit={() => handleGenerate(false)}
+            loading={loading}
+          />
+        </div>
 
         {/* Sağ Panel: Canlı Instagram Telefon & Çıktı Önizlemesi */}
-        <InstagramMockup
-          currentPost={currentPost}
-          posts={posts}
-          currentIndex={currentIndex}
-          onSelectIndex={setCurrentIndex}
-          format={formData.format}
-          overlayText={formData.overlayText}
-          textColor={formData.textColor}
-          logoDataUrl={formData.logoDataUrl}
-        />
+        <div className={`panel-wrapper ${activeMobileTab !== 'preview' ? 'mobile-hidden' : ''}`}>
+          <InstagramMockup
+            currentPost={currentPost}
+            posts={posts}
+            currentIndex={currentIndex}
+            onSelectIndex={setCurrentIndex}
+            format={formData.format}
+            overlayText={formData.overlayText}
+            textColor={formData.textColor}
+            logoDataUrl={formData.logoDataUrl}
+          />
+        </div>
       </main>
 
       {/* Toplu Üretim Penceresi */}
